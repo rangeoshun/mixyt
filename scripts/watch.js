@@ -1,5 +1,6 @@
 const rollup = require("rollup")
 const copy = require("rollup-plugin-copy-glob")
+const resolve = require("rollup-plugin-node-resolve")
 const chalk = require("chalk")
 
 const backgroundWatcher = rollup.watch({
@@ -9,6 +10,7 @@ const backgroundWatcher = rollup.watch({
     format: "cjs"
   },
   plugins: [
+    resolve(),
     copy(
       [
         {
@@ -30,7 +32,17 @@ const contentWatcher = rollup.watch({
   output: {
     file: "build/content_script.js",
     format: "cjs"
-  }
+  },
+  plugins: [resolve()]
+})
+
+const popupWatcher = rollup.watch({
+  input: "src/popup/main.js",
+  output: {
+    file: "build/popup.js",
+    format: "cjs"
+  },
+  plugins: [resolve()]
 })
 
 const buildLogger = event => {
@@ -68,3 +80,4 @@ const buildLogger = event => {
 
 backgroundWatcher.on("event", buildLogger)
 contentWatcher.on("event", buildLogger)
+popupWatcher.on("event", buildLogger)

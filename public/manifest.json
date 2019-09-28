@@ -6,5 +6,9 @@
     "scripts": ["background.js"],
     "persistent": false
   },
+  "permissions": ["declarativeContent", "storage"],
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
   "manifest_version": 2
 }
