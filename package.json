@@ -1,0 +1,14 @@
+{
+  "name": "mixyt",
+  "version": "0.1.0",
+  "description": "A Chrome extension to allow users to turn a Youtube playlist into a DJ deck.",
+  "main": "index.js",
+  "author": "Abel VARGA",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "rollup": "^1.21.4"
+  },
+  "devDependencies": {
+  }
+}
