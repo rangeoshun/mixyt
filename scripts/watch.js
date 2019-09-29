@@ -7,7 +7,7 @@ const backgroundWatcher = rollup.watch({
   input: "src/background/main.js",
   output: {
     file: "build/background.js",
-    format: "cjs"
+    format: "umd"
   },
   plugins: [
     resolve(),
@@ -31,7 +31,7 @@ const contentWatcher = rollup.watch({
   input: "src/content_script/main.js",
   output: {
     file: "build/content_script.js",
-    format: "cjs"
+    format: "umd"
   },
   plugins: [resolve()]
 })
@@ -40,7 +40,7 @@ const popupWatcher = rollup.watch({
   input: "src/popup/main.js",
   output: {
     file: "build/popup.js",
-    format: "cjs"
+    format: "umd"
   },
   plugins: [resolve()]
 })
