@@ -51,4 +51,3 @@ const app_cont = document.getElementById("app-cont")
 const render_app = r.render(app_cont, [app])
 
 state.on_change(render_app)
-window.s = state
