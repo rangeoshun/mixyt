@@ -1,23 +1,54 @@
 import r from "redda/src"
 const { nav, div, a, input, label, ul, li, span } = r.dom
 
-const switcher = [
-  div,
-  { class: "switch center-align" },
+const state = r.state()
+const is_on = () => false
+const toggle = prev => !prev
+
+state.add(is_on, toggle)
+
+const switcher = state.conn(
+  ({ is_on }) => [
+    div,
+    {
+      class: "switch center-align"
+    },
+    [
+      label,
+      "Off",
+      [
+        input,
+        {
+          type: "checkbox",
+          checked: is_on ? "checked" : null,
+          onclick: () => state.disp(toggle)
+        }
+      ],
+      [span, { class: "lever" }],
+      "On"
+    ]
+  ],
+  is_on
+)
+
+const title_bar = () => [
+  nav,
   [
-    label,
-    "Off",
-    [input, { type: "checkbox" }],
-    [span, { class: "lever" }],
-    "On"
+    div,
+    { class: "nav-wrapper" },
+    [div, { class: "container" }, [a, { class: "brand-logo" }, "MixYT"]]
   ]
 ]
 
-const title_bar = [
-  nav,
-  [div, { class: "nav-wrapper" }, [a, { class: "brand-logo" }, "MixYT"]]
+const app = () => [
+  div,
+  { id: "app" },
+  [title_bar],
+  [div, { class: "section" }, [div, { class: "container" }, [switcher]]]
 ]
-const app = [title_bar, [div, { class: "section" }, switcher]]
-const node = document.getElementById("app-cont")
 
-r.render(node, app)
+const app_cont = document.getElementById("app-cont")
+const render_app = r.render(app_cont, [app])
+
+state.on_change(render_app)
+window.s = state
