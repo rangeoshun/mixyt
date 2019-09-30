@@ -1,1 +1,10 @@
 body { width: 300px; }
+
+.brand-logo img {
+    margin-top: 12px;
+}
+
+.brand-logo span {
+    vertical-align: top;
+    margin-left: 6px;
+}

@@ -1,5 +1,5 @@
 import r from "redda/src"
-const { nav, div, a, input, label, ul, li, span } = r.dom
+const { nav, div, a, input, label, ul, li, span, img } = r.dom
 
 const state = r.state()
 const is_on = () => false
@@ -36,19 +36,27 @@ const title_bar = () => [
   [
     div,
     { class: "nav-wrapper" },
-    [div, { class: "container" }, [a, { class: "brand-logo" }, "MixYT"]]
+    [
+      div,
+      { class: "container" },
+      [
+        a,
+        { class: "brand-logo" },
+        [img, { src: "images/icon_32.png" }],
+        [span, "MixYT"]
+      ]
+    ]
   ]
 ]
 
 const attrs = () => [
   div,
   "Icons made by ",
+
   [
-    [
-      a,
-      { href: "https://www.flaticon.com/authors/freepik", title: "Freepik" },
-      "Freepik "
-    ]
+    a,
+    { href: "https://www.flaticon.com/authors/freepik", title: "Freepik" },
+    "Freepik "
   ],
   "from ",
   [
