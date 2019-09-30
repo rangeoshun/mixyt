@@ -58,10 +58,12 @@ const init = () => {
   chrome.tabs.onActivated.addListener(({ tabId } = {}) => {
     if (!tabId) return
 
-    chrome.tabs.get(tabId, tab => ({
-      ...store_tab,
-      ...(tab_exists(tab) || {})
-    }))
+    chrome.tabs.get(tabId, tab =>
+      store_tab({
+        ...tab,
+        ...(tab_exists(tab) || {})
+      })
+    )
   })
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
