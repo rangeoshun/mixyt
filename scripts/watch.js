@@ -16,10 +16,6 @@ const backgroundWatcher = rollup.watch({
         {
           files: "public/**/*.*",
           dest: "build"
-        },
-        {
-          files: "public/assets",
-          dest: "build"
         }
       ],
       { watch: true, verbose: true }

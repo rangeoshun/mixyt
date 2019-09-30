@@ -40,11 +40,34 @@ const title_bar = () => [
   ]
 ]
 
+const attrs = () => [
+  div,
+  "Icons made by ",
+  [
+    [
+      a,
+      { href: "https://www.flaticon.com/authors/freepik", title: "Freepik" },
+      "Freepik "
+    ]
+  ],
+  "from ",
+  [
+    a,
+    { href: "https://www.flaticon.com/", title: "Flaticon" },
+    "www.flaticon.com"
+  ]
+]
+
 const app = () => [
   div,
   { id: "app" },
   [title_bar],
-  [div, { class: "section" }, [div, { class: "container" }, [switcher]]]
+  [
+    div,
+    { class: "container" },
+    [div, { class: "section" }, [switcher]],
+    [div, { class: "section" }, [attrs]]
+  ]
 ]
 
 const app_cont = document.getElementById("app-cont")
