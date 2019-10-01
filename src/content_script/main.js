@@ -30,12 +30,10 @@ const app = () => [
 
 const reload_desktop = () =>
   (location.href =
-    location.href.replace(/m\./, "www.").replace(/&app=m/, "") +
-    "&app=desktop&persist_app=1")
-
-const reload_mobile = () =>
-  (location.href =
-    location.href.replace(/www/, "m").replace(/&app=desktop/, "") + "&app=m")
+    location.href
+      .replace(/m\./, "www.")
+      .replace("&app=m", "")
+      .replace("persist_app=1", "") + "&app=desktop&persist_app=1")
 
 const handle_message = message => {
   if (message.action == "off") return reload_desktop()

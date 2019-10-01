@@ -58,7 +58,6 @@ const send_active_tab = () => {
 const ext_id = chrome.runtime.id
 
 const inject_script = active_tab => {
-  console.log(active_tab)
   if (active_tab.injected) return
 
   chrome.tabs.executeScript(active_tab.id, {
@@ -80,7 +79,9 @@ const handle_message = (message, sender) => {
     store_tab(active_tab)
 
     if (active_tab.is_active) {
-      inject_script(active_tab)
+      chrome.tabs.executeScript(active_tab.id, {
+        code: `location.href = location.href.replace(/www/, "m").replace("&app=desktop", "") + "&app=m"`
+      })
       chrome.webRequest.onBeforeSendHeaders.addListener(
         force_user_agent,
         { urls: ["https://*/*"] },
