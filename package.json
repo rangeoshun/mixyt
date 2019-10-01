@@ -10,12 +10,14 @@
     "watch": "node scripts/watch.js"
   },
   "dependencies": {
+    "redda": "^1.4.3"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.89",
     "chalk": "^2.4.2",
-    "redda": "^1.4.1",
     "rollup": "^1.21.4",
     "rollup-plugin-copy-glob": "^0.3.1",
     "rollup-plugin-dev": "^1.0.0",
     "rollup-plugin-node-resolve": "^5.2.0"
-  },
-  "devDependencies": {}
+  }
 }
