@@ -22,18 +22,18 @@ const set_active = (_, tab_id) => tab_id
 
 state.add(active_tab, set_active)
 
-const store_tab = ({ id, windowId, url, is_youtube, is_active } = {}) => {
-  if (!id) return
+const is_youtube_url = url => !!(url && url.match(/youtube/))
 
-  state.disp(upsert_tab, {
-    id,
-    window_id: windowId,
-    is_youtube:
-      is_youtube == undefined ? !!(url && url.match(/youtube/)) : is_youtube,
-    is_active: !!is_active
-  })
+const convert_tab = ({ id, windowId, url, is_youtube, is_active } = {}) => ({
+  id,
+  window_id: windowId,
+  is_youtube: is_youtube == undefined ? is_youtube_url(url) : is_youtube,
+  is_active: !!is_active
+})
 
-  state.disp(set_active, id)
+const store_tab = tab => {
+  state.disp(upsert_tab, tab)
+  state.disp(set_active, tab.id)
 }
 
 const send_active_tab = () => {
@@ -58,20 +58,22 @@ const init = () => {
   chrome.tabs.onActivated.addListener(({ tabId } = {}) => {
     if (!tabId) return
 
-    chrome.tabs.get(tabId, tab =>
-      store_tab({
-        ...tab,
-        ...(tab_exists(tab) || {})
+    chrome.tabs.get(tabId, tab_ => {
+      const tab = convert_tab({
+        ...tab_,
+        ...(tab_exists(tab_) || {})
       })
-    )
+
+      store_tab(tab)
+      if (!tab.is_youtube) chrome.pageAction.hide(tab.id)
+      else chrome.pageAction.show(tab.id)
+    })
   })
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log(message)
     if (sender.id != chrome.runtime.id) return
-
     if (message.action == "set_active") return store_tab(message.active_tab)
-
     if (message.action == "get_active") return send_active_tab()
   })
 }

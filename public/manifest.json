@@ -11,14 +11,21 @@
     "scripts": ["background.js"],
     "persistent": false
   },
-  "permissions": ["tabs", "storage"],
-  "browser_action": {
+  "permissions": ["tabs", "activeTab", "storage"],
+  "page_action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "images/icon_16.png",
       "32": "images/icon_32.png"
     }
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*.youtube.com/*"],
+      "css": ["content_script.css"],
+      "js": ["content_script.js"]
+    }
+  ],
   "content_security_policy": "default-src 'self'; style-src https://cdnjs.cloudflare.com https://fonts.googleapis.com 'self'; font-src https://fonts.gstatic.com; object-src 'self'; script-src 'unsafe-eval' 'self' blob: filesystem: chrome-extension-resource:;",
   "manifest_version": 2
 }
