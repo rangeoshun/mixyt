@@ -11,7 +11,14 @@
     "scripts": ["background.js"],
     "persistent": true
   },
-  "permissions": ["tabs", "activeTab", "storage", "https://*.youtube.com/,"],
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "https://*.youtube.com/,"
+  ],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {

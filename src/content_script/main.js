@@ -30,7 +30,8 @@ const app = () => [
 
 const reload_desktop = () =>
   (location.href =
-    location.href.replace(/m\./, "www.").replace(/&app=m/, "") + "&app=desktop")
+    location.href.replace(/m\./, "www.").replace(/&app=m/, "") +
+    "&app=desktop&persist_app=1")
 
 const reload_mobile = () =>
   (location.href =
