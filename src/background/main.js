@@ -22,13 +22,17 @@ const set_active = (_, tab_id) => tab_id
 
 state.add(active_tab, set_active)
 
+window.s = state
+
 const is_youtube_url = url => !!(url && url.match(/youtube\.com\/watch/))
 
-const convert_tab = ({ id, windowId, url, is_youtube, is_active } = {}) => ({
-  id,
-  window_id: windowId,
-  is_youtube: is_youtube == undefined ? is_youtube_url(url) : is_youtube,
-  is_active: !!is_active
+const convert_tab = tab => ({
+  id: tab.id,
+  window_id: tab.windowId,
+  is_youtube:
+    tab.is_youtube == undefined ? is_youtube_url(tab.url) : tab.is_youtube,
+  is_active: !!tab.is_active,
+  injected: tab.injected || false
 })
 
 const store_tab = tab => {
@@ -54,12 +58,17 @@ const send_active_tab = () => {
 const ext_id = chrome.runtime.id
 
 const inject_script = active_tab => {
+  console.log(active_tab)
+  if (active_tab.injected) return
+
   chrome.tabs.executeScript(active_tab.id, {
     file: "content_script.js"
   })
   chrome.tabs.insertCSS(active_tab.id, {
     file: "content_script.css"
   })
+
+  state.disp(upsert_tab, { ...active_tab, injected: true })
 }
 
 const handle_message = (message, sender) => {
@@ -79,6 +88,7 @@ const handle_message = (message, sender) => {
       )
     } else {
       chrome.tabs.sendMessage(active_tab.id, { action: "off" })
+      state.disp(upsert_tab, { ...active_tab, injected: false })
       chrome.webRequest.onBeforeSendHeaders.removeListener(force_user_agent)
     }
 
