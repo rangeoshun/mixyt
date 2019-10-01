@@ -125,16 +125,15 @@ const force_user_agent = details => {
   if (!details || !tab.is_active) return {}
 
   return {
-    requestHeaders: details.requestHeaders.map(
-      header =>
-        header.name.toLowerCase() == "user-agent"
-          ? {
-              name: "User-Agent",
-              value:
-                "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
-            }
-          : header
-    )
+    requestHeaders: details.requestHeaders.map(header => {
+      if (header.name.toLowerCase() != "user-agent") return header
+
+      return {
+        name: "User-Agent",
+        value:
+          "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
+      }
+    })
   }
 }
 
