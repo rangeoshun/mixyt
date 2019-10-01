@@ -1,3 +1,24 @@
 body {
-  background-color: #eee;
+  margin: 0;
+  padding: 0;
+}
+
+#app-cont {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#app {
+  display: flex;
+  height: 100%;
+}
+
+#mixer {
+  flex: 1;
+}
+
+.deck {
+  width: 480px;
+  height: 100%;
 }

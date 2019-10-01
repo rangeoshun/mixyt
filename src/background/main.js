@@ -22,7 +22,7 @@ const set_active = (_, tab_id) => tab_id
 
 state.add(active_tab, set_active)
 
-const is_youtube_url = url => !!(url && url.match(/youtube/))
+const is_youtube_url = url => !!(url && url.match(/youtube\.com\/watch/))
 
 const convert_tab = ({ id, windowId, url, is_youtube, is_active } = {}) => ({
   id,
@@ -36,46 +36,98 @@ const store_tab = tab => {
   state.disp(set_active, tab.id)
 }
 
-const send_active_tab = () => {
+const get_active_tab = () => {
   const curr = state.get()
-  const tab = curr.tab_list.find(({ id }) => id == curr.active_tab)
+
+  return curr.tab_list.find(({ id }) => id == curr.active_tab)
+}
+
+const send_active_tab = () => {
+  const tab = get_active_tab()
 
   chrome.runtime.sendMessage(ext_id, {
     action: "set_active",
-    active_tab: curr.tab_list.find(({ id }) => tab.id == id)
+    active_tab: tab
   })
 }
 
 const ext_id = chrome.runtime.id
 
-window.s = state
+const handle_message = (message, sender, sendResponse) => {
+  if (sender.id != chrome.runtime.id) return
+
+  if (message.action == "set_active") {
+    const active_tab = message.active_tab
+
+    store_tab(active_tab)
+
+    if (active_tab.is_active) {
+      chrome.tabs.executeScript(active_tab.id, {
+        file: "content_script.js"
+      })
+      chrome.tabs.insertCSS(active_tab.id, {
+        file: "content_script.css"
+      })
+    }
+
+    return
+  }
+
+  if (message.action == "get_active") return send_active_tab()
+}
+
+const handle_tab_switch = ({ tabId } = {}) => {
+  if (!tabId) return
+
+  chrome.tabs.get(tabId, tab_ => {
+    const tab = convert_tab({
+      ...tab_,
+      ...(tab_exists(tab_) || {})
+    })
+
+    store_tab(tab)
+
+    if (!tab.is_youtube) chrome.browserAction.disable(tab.id)
+    else chrome.browserAction.enable(tab.id)
+  })
+}
+
+const force_user_agent = details => {
+  const tab = get_active_tab()
+
+  if (!details || !tab.is_active) return {}
+
+  return {
+    requestHeaders: details.requestHeaders.map(
+      header =>
+        header.name.toLowerCase() == "user-agent"
+          ? {
+              name: "User-Agent",
+              value:
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
+            }
+          : header
+    )
+  }
+}
 
 const init = () => {
-  state.on_change(send_active_tab)
-
+  state.on_change(() => {
+    const tab = get_active_tab()
+    send_active_tab()
+    console.log(tab)
+    if (!tab.is_active)
+      chrome.webRequest.onBeforeSendHeaders.removeListener(force_user_agent)
+    else
+      chrome.webRequest.onBeforeSendHeaders.addListener(
+        force_user_agent,
+        { urls: ["https://*/*"] },
+        ["blocking", "requestHeaders"]
+      )
+  })
   chrome.tabs.query({ active: true }, ([tab]) => store_tab(tab))
-
-  chrome.tabs.onActivated.addListener(({ tabId } = {}) => {
-    if (!tabId) return
-
-    chrome.tabs.get(tabId, tab_ => {
-      const tab = convert_tab({
-        ...tab_,
-        ...(tab_exists(tab_) || {})
-      })
-
-      store_tab(tab)
-      if (!tab.is_youtube) chrome.pageAction.hide(tab.id)
-      else chrome.pageAction.show(tab.id)
-    })
-  })
-
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log(message)
-    if (sender.id != chrome.runtime.id) return
-    if (message.action == "set_active") return store_tab(message.active_tab)
-    if (message.action == "get_active") return send_active_tab()
-  })
+  chrome.tabs.onActivated.addListener(handle_tab_switch)
+  chrome.runtime.onMessage.addListener(handle_message)
 }
 
 init()

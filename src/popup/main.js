@@ -1,4 +1,5 @@
 import r from "redda/src"
+
 const { nav, div, a, input, label, ul, li, span, img } = r.dom
 
 const state = r.state()
@@ -104,11 +105,6 @@ const app = () => [
   ]
 ]
 
-const app_cont = document.getElementById("app-cont")
-const render_app = r.render(app_cont, [app])
-
-state.on_change(render_app)
-
 window.s = state
 
 const store_tab = tab =>
@@ -117,8 +113,12 @@ const store_tab = tab =>
 const ext_id = chrome.runtime.id
 
 const init = () => {
+  const app_cont = document.getElementById("app-cont")
+  const render_app = r.render(app_cont, [app])
+
+  state.on_change(render_app)
+
   chrome.runtime.onMessage.addListener((message, sender) => {
-    console.log(message)
     if (sender.id != chrome.runtime.id) return
 
     if (message.action == "set_active") store_tab(message.active_tab)

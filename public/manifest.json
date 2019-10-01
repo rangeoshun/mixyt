@@ -9,10 +9,16 @@
   },
   "background": {
     "scripts": ["background.js"],
-    "persistent": false
+    "persistent": true
   },
-  "permissions": ["tabs", "activeTab", "storage"],
-  "page_action": {
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage",
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "images/icon_16.png",
@@ -21,7 +27,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://*.youtube.com/*"],
+      "matches": ["http://*.youtube.com/watch*"],
       "css": ["content_script.css"],
       "js": ["content_script.js"]
     }
