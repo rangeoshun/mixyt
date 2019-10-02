@@ -136,11 +136,14 @@ const force_user_agent = details => {
   }
 }
 
+const handle_remove = id => state.disp(rm_tab, { id })
+
 const init = () => {
   state.on_change(send_active_tab)
   tabs.query({ active: true }, ([tab]) => store_tab(tab))
   tabs.onActivated.addListener(handle_tab_switch)
   tabs.onUpdated.addListener(handle_update)
+  tabs.onRemoved.addListener(handle_remove)
   runtime.onMessage.addListener(handle_message)
 }
 
