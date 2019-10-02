@@ -1,26 +1,13 @@
 import r from "redda/src"
 
-const state = r.state()
-
-const tab_exists = tab => state.get().tab_list.find(({ id }) => id == tab.id)
-
-const tab_list = () => []
-const upsert_tab = (tab_list, tab) => {
-  const existing = tab_exists(tab)
-
-  if (existing) return tab_list.map(ex => (ex.id == tab.id ? tab : ex))
-
-  return [...tab_list, tab]
-}
-
-const rm_tab = (tab_list, tab) => tab_list.filter(({ id }) => tab.id != id)
-
-state.add(tab_list, upsert_tab, rm_tab)
-
-const active_tab = () => null
-const set_active = (_, tab_id) => tab_id
-
-state.add(active_tab, set_active)
+import {
+  state,
+  tab_exists,
+  upsert_tab,
+  rm_tab,
+  active_tab,
+  set_active
+} from "./state"
 
 window.s = state
 
