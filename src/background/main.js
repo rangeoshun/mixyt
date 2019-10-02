@@ -24,6 +24,9 @@ state.add(active_tab, set_active)
 
 window.s = state
 
+const runtime = chrome.runtime
+const tabs = chrome.tabs
+
 const is_youtube_url = url => !!(url && url.match(/youtube\.com\/watch/))
 
 const convert_tab = tab => ({
@@ -49,21 +52,19 @@ const get_active_tab = () => {
 const send_active_tab = () => {
   const tab = get_active_tab()
 
-  chrome.runtime.sendMessage(ext_id, {
+  runtime.sendMessage(runtime.id, {
     action: "set_active",
     active_tab: tab
   })
 }
 
-const ext_id = chrome.runtime.id
-
 const inject_script = active_tab => {
   if (active_tab.injected) return
 
-  chrome.tabs.executeScript(active_tab.id, {
+  tabs.executeScript(active_tab.id, {
     file: "content_script.js"
   })
-  chrome.tabs.insertCSS(active_tab.id, {
+  tabs.insertCSS(active_tab.id, {
     file: "content_script.css"
   })
 
@@ -71,7 +72,7 @@ const inject_script = active_tab => {
 }
 
 const handle_message = (message, sender) => {
-  if (sender.id != chrome.runtime.id) return
+  if (sender.id != runtime.id) return
 
   if (message.action == "set_active") {
     const active_tab = message.active_tab
@@ -79,7 +80,7 @@ const handle_message = (message, sender) => {
     store_tab(active_tab)
 
     if (active_tab.is_active) {
-      chrome.tabs.executeScript(active_tab.id, {
+      tabs.executeScript(active_tab.id, {
         code: `location.href = location.href.replace(/www/, "m").replace("&app=desktop", "") + "&app=m"`
       })
       chrome.webRequest.onBeforeSendHeaders.addListener(
@@ -88,7 +89,7 @@ const handle_message = (message, sender) => {
         ["blocking", "requestHeaders"]
       )
     } else {
-      chrome.tabs.sendMessage(active_tab.id, { action: "off" })
+      tabs.sendMessage(active_tab.id, { action: "off" })
       state.disp(upsert_tab, { ...active_tab, injected: false })
       chrome.webRequest.onBeforeSendHeaders.removeListener(force_user_agent)
     }
@@ -108,7 +109,7 @@ const convert_native_tab = tab_ =>
 const handle_tab_switch = ({ tabId } = {}) => {
   if (!tabId) return
 
-  chrome.tabs.get(tabId, tab_ => {
+  tabs.get(tabId, tab_ => {
     const tab = convert_native_tab(tab_)
 
     store_tab(tab)
@@ -150,10 +151,10 @@ const force_user_agent = details => {
 
 const init = () => {
   state.on_change(send_active_tab)
-  chrome.tabs.query({ active: true }, ([tab]) => store_tab(tab))
-  chrome.tabs.onActivated.addListener(handle_tab_switch)
-  chrome.tabs.onUpdated.addListener(handle_update)
-  chrome.runtime.onMessage.addListener(handle_message)
+  tabs.query({ active: true }, ([tab]) => store_tab(tab))
+  tabs.onActivated.addListener(handle_tab_switch)
+  tabs.onUpdated.addListener(handle_update)
+  runtime.onMessage.addListener(handle_message)
 }
 
 init()
