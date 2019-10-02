@@ -1,6 +1,6 @@
 import r from "redda/src"
 
-const { div, iframe } = r.dom
+import { app } from "./views"
 
 const body = document.body
 const head = document.head
@@ -8,25 +8,6 @@ const head = document.head
 const clear_frame = () => (
   (body.innerHTML = '<div id="app-cont" />'), (head.innerHTML = "")
 )
-
-const deck = name => () => [
-  iframe,
-  {
-    class: `deck ${name}`,
-    frameBorder: "none",
-    src: window.location.href.replace(/desktop/, "m") + "&mixyt_role=" + name
-  }
-]
-
-const mixer = [div, { id: "mixer" }]
-
-const app = () => [
-  div,
-  { id: "app" },
-  [deck("deck-a")],
-  [mixer],
-  [deck("deck-b")]
-]
 
 const reload_desktop = () =>
   (location.href =
