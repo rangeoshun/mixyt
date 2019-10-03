@@ -25,10 +25,7 @@ const convert_tab = tab => ({
   injected: tab.injected || false
 })
 
-const store_tab = tab => {
-  state.disp(upsert_tab, tab)
-  state.disp(set_active, tab.id)
-}
+const store_tab = tab => state.disp(upsert_tab, tab)
 
 const get_active_tab = () => {
   const curr = state.get()
@@ -87,11 +84,12 @@ const handle_message = (message, sender) => {
   if (message.action == "get_active") return send_active_tab()
 }
 
-const convert_native_tab = tab_ =>
-  convert_tab({
-    ...tab_,
-    ...(tab_exists(tab_) || {})
-  })
+const convert_native_tab = tab_ => ({
+  ...convert_tab(tab_),
+  ...(tab_exists(tab_) || {})
+})
+
+const set_active_tab = tab => state.disp(set_active, tab.id)
 
 const handle_tab_switch = ({ tabId } = {}) => {
   if (!tabId) return
@@ -100,6 +98,7 @@ const handle_tab_switch = ({ tabId } = {}) => {
     const tab = convert_native_tab(tab_)
 
     store_tab(tab)
+    set_active_tab(tab)
 
     if (!tab.is_youtube) chrome.browserAction.disable(tab.id)
     else chrome.browserAction.enable(tab.id)
@@ -136,11 +135,17 @@ const force_user_agent = details => {
   }
 }
 
+const init_active_tab = ([tab_]) => {
+  const tab = convert_native_tab(tab_)
+  store_tab(tab)
+  set_active_tab(tab)
+}
+
 const handle_remove = id => state.disp(rm_tab, { id })
 
 const init = () => {
   state.on_change(send_active_tab)
-  tabs.query({ active: true }, ([tab]) => store_tab(tab))
+  tabs.query({ active: true }, init_active_tab)
   tabs.onActivated.addListener(handle_tab_switch)
   tabs.onUpdated.addListener(handle_update)
   tabs.onRemoved.addListener(handle_remove)
