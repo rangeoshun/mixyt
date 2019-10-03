@@ -1,7 +1,7 @@
 import r from "redda/src"
 
 import { app } from "./views"
-import { state, master, set_master_src } from "./state"
+import { state, init_state, master, set_master_src } from "./state"
 
 const body = document.body
 const head = document.head
@@ -29,6 +29,11 @@ const init = () => {
 
   const app_cont = document.getElementById("app-cont")
   const render_app = r.render(app_cont, [app])
+
+  window.onload = () => {
+    init_state()
+    console.log(state.get())
+  }
 
   chrome.runtime.onMessage.addListener(handle_message)
 }
