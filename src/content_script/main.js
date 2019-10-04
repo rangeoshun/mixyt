@@ -17,15 +17,8 @@ const clear_frame = () => (
   (body.innerHTML = '<div id="app-cont" />'), (head.innerHTML = "")
 )
 
-const reload_desktop = () =>
-  (location.href =
-    location.href
-      .replace(/m\./, "www.")
-      .replace("&app=m", "")
-      .replace("persist_app=1", "") + "&app=desktop&persist_app=1")
-
 const handle_message = message => {
-  if (message.action == "off") return reload_desktop()
+  if (message.action == "off") return window.location.reload()
 }
 
 const get_player = name =>
@@ -55,8 +48,6 @@ const init_state = label => {
 }
 
 const init = () => {
-  if (!location.href.match(/m\.youtube/)) return reload_mobile()
-
   console.clear()
   clear_frame()
 

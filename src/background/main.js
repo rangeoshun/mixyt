@@ -65,25 +65,16 @@ const handle_message = (message, sender) => {
     store_tab(active_tab)
 
     if (active_tab.is_active) {
-      tabs.executeScript(active_tab.id, {
-        code: `location.href = location.href.replace(/www/, "m").replace("&app=desktop", "") + "&app=m"`
-      })
-
-      webRequest.onBeforeSendHeaders.addListener(
-        force_user_agent,
-        { urls: ["https://*/*"], tabId: active_tab.id },
-        ["blocking", "requestHeaders", "extraHeaders"]
-      )
-
       webRequest.onHeadersReceived.addListener(
         force_video_cors,
         { urls: ["https://*.googlevideo.com/*"], tabId: active_tab.id },
         ["blocking", "responseHeaders", "extraHeaders"]
       )
+
+      inject_script(active_tab)
     } else {
       tabs.sendMessage(active_tab.id, { action: "off" })
       state.disp(upsert_tab, { ...active_tab, injected: false })
-      webRequest.onBeforeSendHeaders.removeListener(force_user_agent)
     }
 
     return
@@ -120,33 +111,17 @@ const handle_update = (id, change, tab_) => {
   store_tab(tab)
 
   if (active_tab.id != id || !active_tab.is_youtube) return
-
-  if (change.status == "loading" && active_tab.is_active)
-    return inject_script(active_tab)
 }
 
+const CORS_HEADER_NAME = "Access-Control-Allow-Origin"
 const force_video_cors = details => {
   return {
-    responseHeaders: details.responseHeaders.concat({
-      name: "Access-Control-Allow-Origin",
-      value: "*"
-    })
-  }
-}
-
-const force_user_agent = details => {
-  const tab = get_active_tab()
-
-  if (!details || !tab.is_active) return {}
-
-  return {
-    requestHeaders: details.requestHeaders.map(header => {
-      if (header.name.toLowerCase() != "user-agent") return header
+    responseHeaders: details.responseHeaders.map(header => {
+      if (header.name != CORS_HEADER_NAME) return header
 
       return {
-        name: "User-Agent",
-        value:
-          "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
+        name: CORS_HEADER_NAME,
+        value: "*"
       }
     })
   }
