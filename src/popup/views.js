@@ -1,7 +1,7 @@
 import r from "redda/src"
-import { state, is_on, toggle, active_tab } from "./state"
+import { state, is_on, toggle, active_tab, devices } from "./state"
 
-const { nav, div, a, input, label, ul, li, span, img } = r.dom
+const { nav, div, a, input, label, ul, li, span, img, select, option } = r.dom
 
 const switcher = state.conn(
   ({ is_on, active_tab }) => {
@@ -68,6 +68,25 @@ const attrs = () => [
   ]
 ]
 
+const device_select = is_master =>
+  state.conn(
+    ({ devices }) => [
+      div,
+      { class: "input-field" },
+      [
+        select,
+        [
+          option,
+          { value: "", disabled: "disabled", selected: "selected" },
+          "Choose device"
+        ],
+        devices.map(({ id, label }) => [option, { value: id }, label])
+      ],
+      [label, is_master ? "Master" : "Monitor", " output device"]
+    ],
+    devices
+  )
+
 export const app = () => [
   div,
   { id: "app" },
@@ -76,6 +95,8 @@ export const app = () => [
     div,
     { class: "container" },
     [div, { class: "section" }, [switcher]],
+    [div, { class: "section" }, [device_select(true)]],
+    [div, { class: "section" }, [device_select(false)]],
     [div, { class: "section" }, [attrs]]
   ]
 ]

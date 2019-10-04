@@ -81,9 +81,3 @@ export const set_player = ({ player_a, player_b }, players) => ({
 export const set_player_prop = (players, props) => set_prop(players, props)
 
 state.add(players, set_player, set_player_prop)
-
-export const devices = () => []
-
-export const set_devices = (_, list) => list
-
-state.add(devices, set_devices)

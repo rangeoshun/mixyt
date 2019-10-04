@@ -14,6 +14,7 @@ import {
 } from "./state"
 
 const runtime = chrome.runtime
+const storage = chrome.storage
 const body = document.body
 const head = document.head
 
@@ -67,41 +68,32 @@ const materialize = cb => {
   link.href =
     "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
   body.appendChild(link)
-
-  const script = document.createElement("script")
-  script.onload = cb
-  script.src =
-    "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"
-  body.appendChild(script)
 }
 
 const init = () => {
+  console.clear()
+  clear_frame()
+  materialize()
+
   const app_cont = document.getElementById("app-cont")
   const render_app = r.render(app_cont, [app])
 
   runtime.onMessage.addListener(handle_message)
 
   state.on_change(() => {
-    const selects = document.querySelectorAll("select")
-    M.FormSelect.init(selects, {})
     console.log(state.get())
   })
 
   document.querySelector(".deck-a").contentWindow.onload = () => init_state("a")
   document.querySelector(".deck-b").contentWindow.onload = () => init_state("b")
 
-  navigator.mediaDevices
-    .enumerateDevices()
-    .then(devs =>
-      state.disp(
-        set_devices,
-        devs
-          .filter(({ kind }) => kind == "audiooutput")
-          .map(({ deviceId, label }) => ({ id: deviceId, label }))
-      )
-    )
+  navigator.mediaDevices.enumerateDevices().then(devs =>
+    chrome.storage.local.set({
+      devices: devs
+        .filter(({ kind }) => kind == "audiooutput")
+        .map(({ deviceId, label }) => ({ id: deviceId, label }))
+    })
+  )
 }
 
-console.clear()
-clear_frame()
-materialize(init)
+init()

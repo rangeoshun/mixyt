@@ -30,3 +30,8 @@ export const toggle = prev => {
 }
 
 state.add(is_on, set_on, toggle)
+
+export const devices = () => []
+export const set_devices = (_, list) => list
+
+state.add(devices, set_devices)

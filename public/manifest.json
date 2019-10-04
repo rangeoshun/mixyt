@@ -1,8 +1,7 @@
 {
   "name": "MixYT",
   "version": "1.0",
-  "description":
-    "A Chrome extension to allow users to convert a Youtube playlist into a DJ deck.",
+  "description": "A Chrome extension to allow users to convert a Youtube playlist into a DJ deck.",
   "icons": {
     "16": "images/icon_16.png",
     "48": "images/icon_48.png",
@@ -36,7 +35,6 @@
       "js": ["content_script.js"]
     }
   ],
-  "content_security_policy":
-    "default-src 'self'; style-src https://cdnjs.cloudflare.com https://fonts.googleapis.com 'self'; font-src https://fonts.gstatic.com; object-src 'self'; script-src 'unsafe-eval' 'self' blob: filesystem: chrome-extension-resource:;",
+  "content_security_policy": "default-src 'self'; style-src https://cdnjs.cloudflare.com https://fonts.googleapis.com 'self'; font-src https://fonts.gstatic.com; object-src 'self'; script-src https://cdnjs.cloudflare.com 'unsafe-eval' 'self' blob: filesystem: chrome-extension-resource:;",
   "manifest_version": 2
 }

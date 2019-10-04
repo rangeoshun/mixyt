@@ -9,7 +9,7 @@ import {
   devices
 } from "./state"
 
-const { div, audio, iframe, label, select, option, link, script } = r.dom
+const { div, audio, iframe } = r.dom
 
 const deck = name => () => [
   iframe,
@@ -22,35 +22,7 @@ const deck = name => () => [
 
 const output = name => () => [audio, { class: name }]
 
-const device_select = is_master =>
-  state.conn(
-    ({ devices, monitor, master }) => [
-      div,
-      [
-        div,
-        { class: "input-field col s12" },
-        [
-          select,
-          [
-            option,
-            { value: "", disabled: "disabled", selected: "selected" },
-            "Choose device"
-          ]
-        ],
-        [label, is_master ? "Master" : "Monitor", " output device"]
-      ]
-    ],
-    devices,
-    monitor,
-    master
-  )
-
-const mixer = () => [
-  div,
-  { id: "mixer" },
-  [device_select(true)],
-  [device_select(false)]
-]
+const mixer = () => [div, { id: "mixer" }]
 
 export const app = () => [
   div,
