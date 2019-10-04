@@ -31,37 +31,26 @@ const handle_message = message => {
 const get_player = name =>
   document.querySelector(name).contentDocument.querySelector("video")
 
-const init_state = () => {
-  const player_a = get_player(".deck-a")
-  const player_b = get_player(".deck-b")
-
-  player_a.setAttribute("crossOrigin", true)
-  player_a.src = player_a.src
-  player_b.setAttribute("crossOrigin", true)
-  player_b.src = player_b.src
+const init_state = label => {
+  const name = `player_${label}`
+  const player = get_player(`.deck-${label}`)
 
   state.disp(set_master, {
-    out_a: document.querySelector(".master-a"),
-    out_b: document.querySelector(".master-b")
+    [`out_${label}`]: document.querySelector(`.master-${label}`)
   })
 
-  state.disp(set_player, { player_a, player_b })
+  state.disp(set_player, { [name]: player })
 
   state.disp(set_player_prop, {
-    name: "player_a",
+    name: name,
     volume: 0,
-    muted: false
-  })
-
-  state.disp(set_player_prop, {
-    name: "player_b",
-    volume: 0,
-    muted: false
+    muted: false,
+    src: player.src,
+    crossorigin: true
   })
 
   state.disp(set_master_src, {
-    src_a: player_a.captureStream(),
-    src_b: player_b.captureStream()
+    [`src_${label}`]: player.captureStream()
   })
 }
 
@@ -79,7 +68,8 @@ const init = () => {
   state.on_change(() => console.log(state.get()))
 
   window.onload = () => {
-    init_state()
+    init_state("a")
+    init_state("b")
   }
 }
 

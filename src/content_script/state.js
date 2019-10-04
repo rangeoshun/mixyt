@@ -40,13 +40,15 @@ export const set_player = ({ player_a, player_b }, players) => ({
 
 export const set_player_prop = (
   players,
-  { name, muted, volume, playback_rate }
+  { name, muted, volume, rate, crossorigin, src }
 ) => {
   const player = players[name]
 
-  if (volume != undefined) player.muted = muted
+  if (crossorigin) player.setAttribute("crossOrigin", crossorigin)
+  if (src) player.src = src
+  if (muted != undefined) player.muted = muted
   if (volume != undefined) player.volume = volume
-  if (playback_rate != undefined) player.playbackRate = playback_rate
+  if (rate != undefined) player.playbackRate = rate
 
   return players
 }
