@@ -2,40 +2,53 @@ import r from "redda/src"
 
 export const state = r.state()
 
-export const master = (out_a, out_b) => () => {
-  out_a, out_b
-}
+export const master = () => ({
+  out_a: null,
+  out_b: null
+})
+
+export const set_master = ({ out_a, out_b }, master) => ({
+  out_a: master.out_a || out_a,
+  out_b: master.out_b || out_b
+})
 
 export const set_master_src = ({ out_a, out_b }, { src_a, src_b }) => {
-  if (src_a) master.out_a = null
-  if (src_b) master.out_b = null
+  if (out_a && src_a) {
+    out_a.srcObject = src_a
+    out_a.play()
+  }
+
+  if (out_b && src_b) {
+    out_b.srcObject = src_b
+    out_b.play()
+  }
 
   return { out_a, out_b }
 }
 
-const get_player = name =>
-  document.querySelector(name).contentDocument.querySelector("video")
+state.add(master, set_master, set_master_src)
 
-export const players = (player_a, player_b) => () => {
-  player_a, player_b
-}
+export const players = () => ({
+  player_a: null,
+  player_b: null
+})
 
-export const set_player_prop = (players, { name, volume, playback_rate }) => {
-  const player = players[props.name]
+export const set_player = ({ player_a, player_b }, players) => ({
+  player_a: players.player_a || player_a,
+  player_b: players.player_b || player_b
+})
 
+export const set_player_prop = (
+  players,
+  { name, muted, volume, playback_rate }
+) => {
+  const player = players[name]
+
+  if (volume != undefined) player.muted = muted
   if (volume != undefined) player.volume = volume
   if (playback_rate != undefined) player.playbackRate = playback_rate
 
   return players
 }
 
-export const init_state = () => {
-  const player_a = get_player("#deck-a")
-  const player_b = get_player("#deck-b")
-
-  const out_a = document.createElement("audio")
-  const out_b = document.createElement("audio")
-
-  state.conn(master(out_a, out_b), set_master_src)
-  state.conn(players(player_a, player_b), set_player_prop)
-}
+state.add(players, set_player, set_player_prop)

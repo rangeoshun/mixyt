@@ -1,6 +1,6 @@
 import r from "redda/src"
 
-const { div, iframe } = r.dom
+const { div, audio, iframe } = r.dom
 
 const deck = name => () => [
   iframe,
@@ -11,6 +11,8 @@ const deck = name => () => [
   }
 ]
 
+const master = name => () => [audio, { class: name }]
+
 const mixer = [div, { id: "mixer" }]
 
 export const app = () => [
@@ -18,5 +20,7 @@ export const app = () => [
   { id: "app" },
   [deck("deck-a")],
   [mixer],
-  [deck("deck-b")]
+  [deck("deck-b")],
+  [master("master-a")],
+  [master("master-b")]
 ]

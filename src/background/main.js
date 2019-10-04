@@ -13,6 +13,7 @@ window.s = state
 
 const runtime = chrome.runtime
 const tabs = chrome.tabs
+const webRequest = chrome.webRequest
 
 const is_youtube_url = url => !!(url && url.match(/youtube\.com\/watch/))
 
@@ -67,15 +68,22 @@ const handle_message = (message, sender) => {
       tabs.executeScript(active_tab.id, {
         code: `location.href = location.href.replace(/www/, "m").replace("&app=desktop", "") + "&app=m"`
       })
-      chrome.webRequest.onBeforeSendHeaders.addListener(
+
+      webRequest.onBeforeSendHeaders.addListener(
         force_user_agent,
-        { urls: ["https://*/*"] },
-        ["blocking", "requestHeaders"]
+        { urls: ["https://*/*"], tabId: active_tab.id },
+        ["blocking", "requestHeaders", "extraHeaders"]
+      )
+
+      webRequest.onHeadersReceived.addListener(
+        force_video_cors,
+        { urls: ["https://*.googlevideo.com/*"], tabId: active_tab.id },
+        ["blocking", "responseHeaders", "extraHeaders"]
       )
     } else {
       tabs.sendMessage(active_tab.id, { action: "off" })
       state.disp(upsert_tab, { ...active_tab, injected: false })
-      chrome.webRequest.onBeforeSendHeaders.removeListener(force_user_agent)
+      webRequest.onBeforeSendHeaders.removeListener(force_user_agent)
     }
 
     return
@@ -115,6 +123,15 @@ const handle_update = (id, change, tab_) => {
 
   if (change.status == "loading" && active_tab.is_active)
     return inject_script(active_tab)
+}
+
+const force_video_cors = details => {
+  return {
+    responseHeaders: details.responseHeaders.concat({
+      name: "Access-Control-Allow-Origin",
+      value: "*"
+    })
+  }
 }
 
 const force_user_agent = details => {
