@@ -13,8 +13,9 @@
     "persistent": true
   },
   "permissions": [
-    "tabs",
     "activeTab",
+    "contentSettings",
+    "tabs",
     "storage",
     "webRequest",
     "webRequestBlocking",

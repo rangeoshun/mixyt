@@ -1,12 +1,16 @@
 import r from "redda/src"
 
 import { app } from "./views"
+
 import {
   state,
+  set_monitor,
+  set_monitor_src,
   set_master,
   set_master_src,
   set_player,
-  set_player_prop
+  set_player_prop,
+  set_devices
 } from "./state"
 
 const runtime = chrome.runtime
@@ -21,12 +25,14 @@ const handle_message = message => {
   if (message.action == "off") return window.location.reload()
 }
 
-const get_player = name =>
-  document.querySelector(name).contentDocument.querySelector("video")
-
 const init_state = label => {
   const name = `player_${label}`
-  const player = get_player(`.deck-${label}`)
+  const deck_doc = document.querySelector(`.deck-${label}`).contentDocument
+  const player = deck_doc.querySelector("video")
+
+  state.disp(set_monitor, {
+    [`out_${label}`]: document.querySelector(`.monitor-${label}`)
+  })
 
   state.disp(set_master, {
     [`out_${label}`]: document.querySelector(`.master-${label}`)
@@ -42,26 +48,60 @@ const init_state = label => {
     crossorigin: true
   })
 
+  state.disp(set_monitor_src, {
+    [`src_${label}`]: player.captureStream()
+  })
+
   state.disp(set_master_src, {
     [`src_${label}`]: player.captureStream()
   })
+
+  setTimeout(() =>
+    deck_doc.querySelector("ytd-playlist-panel-video-renderer").click()
+  )
+}
+
+const materialize = cb => {
+  const link = document.createElement("link")
+  link.rel = "stylesheet"
+  link.href =
+    "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+  body.appendChild(link)
+
+  const script = document.createElement("script")
+  script.onload = cb
+  script.src =
+    "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"
+  body.appendChild(script)
 }
 
 const init = () => {
-  console.clear()
-  clear_frame()
-
   const app_cont = document.getElementById("app-cont")
   const render_app = r.render(app_cont, [app])
 
   runtime.onMessage.addListener(handle_message)
 
-  state.on_change(() => console.log(state.get()))
+  state.on_change(() => {
+    const selects = document.querySelectorAll("select")
+    M.FormSelect.init(selects, {})
+    console.log(state.get())
+  })
 
-  window.onload = () => {
-    init_state("a")
-    init_state("b")
-  }
+  document.querySelector(".deck-a").contentWindow.onload = () => init_state("a")
+  document.querySelector(".deck-b").contentWindow.onload = () => init_state("b")
+
+  navigator.mediaDevices
+    .enumerateDevices()
+    .then(devs =>
+      state.disp(
+        set_devices,
+        devs
+          .filter(({ kind }) => kind == "audiooutput")
+          .map(({ deviceId, label }) => ({ id: deviceId, label }))
+      )
+    )
 }
 
-init()
+console.clear()
+clear_frame()
+materialize(init)

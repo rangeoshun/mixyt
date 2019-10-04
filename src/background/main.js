@@ -14,6 +14,7 @@ window.s = state
 const runtime = chrome.runtime
 const tabs = chrome.tabs
 const webRequest = chrome.webRequest
+const contentSettings = chrome.contentSettings
 
 const is_youtube_url = url => !!(url && url.match(/youtube\.com\/watch/))
 
@@ -142,6 +143,10 @@ const init = () => {
   tabs.onUpdated.addListener(handle_update)
   tabs.onRemoved.addListener(handle_remove)
   runtime.onMessage.addListener(handle_message)
+  contentSettings.microphone.set({
+    primaryPattern: "https://www.youtube.com/*",
+    setting: "allow"
+  })
 }
 
 init()

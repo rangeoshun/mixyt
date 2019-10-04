@@ -22,3 +22,7 @@ body {
   width: 480px;
   height: 100%;
 }
+
+.ytp-spinner {
+  display: none;
+}
