@@ -84,7 +84,6 @@ const set_devices = ({ monitor_device, master_device } = {}) => {
 }
 
 const init = () => {
-  console.clear()
   clear_frame()
   materialize()
 
@@ -92,10 +91,6 @@ const init = () => {
   const render_app = r.render(app_cont, [app])
 
   runtime.onMessage.addListener(handle_message)
-
-  state.on_change(() => {
-    console.log(state.get())
-  })
 
   document.querySelector(".deck-a").contentWindow.onload = () => init_state("a")
   document.querySelector(".deck-b").contentWindow.onload = () => init_state("b")
