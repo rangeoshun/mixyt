@@ -5,8 +5,7 @@ import {
   monitor,
   set_monitor_device,
   master,
-  set_master_device,
-  devices
+  set_master_device
 } from "./state"
 
 const { div, audio, iframe } = r.dom

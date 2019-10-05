@@ -1,6 +1,13 @@
 import r from "redda/src"
 import { app } from "./views"
-import { state, set_tab, set_on, set_devices } from "./state"
+import {
+  state,
+  set_tab,
+  set_on,
+  set_devices,
+  set_monitor,
+  set_master
+} from "./state"
 
 window.s = state
 const runtime = chrome.runtime
@@ -14,12 +21,13 @@ const handle_devices = (devices = []) => state.disp(set_devices, devices)
 const init = () => {
   const app_cont = document.getElementById("app-cont")
   const render_app = r.render(app_cont, [app])
+  M.FormSelect.init(document.querySelectorAll("select"))
 
   state.on_change(() => {
     render_app()
-    console.log(state.get())
-    M.updateTextFields()
-    M.FormSelect.init(document.querySelectorAll("select"))
+    setTimeout(() => {
+      M.FormSelect.init(document.querySelectorAll("select"))
+    })
   })
 
   runtime.onMessage.addListener((message, sender) => {
@@ -29,9 +37,17 @@ const init = () => {
   })
 
   runtime.sendMessage(runtime.id, { action: "get_active" })
-  storage.local.get(["devices"], ({ devices }) => handle_devices(devices))
+  storage.local.get(
+    ["devices", "monitor_device", "master_device"],
+    ({ devices, monitor_device, master_device }) => {
+      if (devices) handle_devices(devices)
+      if (monitor_device) state.disp(set_monitor, monitor_device)
+      if (master_device) state.disp(set_master, master_device)
+    }
+  )
   storage.onChanged.addListener(
-    ({ newValue: { devices } } = {}) => devices && handle_devices(newValue)
+    changes =>
+      changes && changes.devices && handle_devices(changes.devices.newValue)
   )
 }
 

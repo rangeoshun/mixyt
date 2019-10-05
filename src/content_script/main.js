@@ -8,9 +8,10 @@ import {
   set_monitor_src,
   set_master,
   set_master_src,
+  set_master_device,
   set_player,
   set_player_prop,
-  set_devices
+  set_monitor_device
 } from "./state"
 
 const runtime = chrome.runtime
@@ -47,12 +48,16 @@ const init_state = label => {
   const observer = new MutationObserver(mutations => {
     if (!is_src_mutation(mutations)) return
 
+    const stream = player.captureStream()
+    const video = stream.getVideoTracks()[0]
+    stream.removeTrack(video)
+
     state.disp(set_monitor_src, {
-      [`src_${label}`]: player.captureStream()
+      [`src_${label}`]: stream
     })
 
     state.disp(set_master_src, {
-      [`src_${label}`]: player.captureStream()
+      [`src_${label}`]: stream
     })
   })
 
@@ -75,6 +80,11 @@ const materialize = cb => {
   body.appendChild(link)
 }
 
+const set_devices = ({ monitor_device, master_device } = {}) => {
+  if (monitor_device) state.disp(set_monitor_device, monitor_device)
+  if (master_device) state.disp(set_master_device, master_device)
+}
+
 const init = () => {
   console.clear()
   clear_frame()
@@ -93,10 +103,18 @@ const init = () => {
   document.querySelector(".deck-b").contentWindow.onload = () => init_state("b")
 
   navigator.mediaDevices.enumerateDevices().then(devs =>
-    chrome.storage.local.set({
+    storage.local.set({
       devices: devs
         .filter(({ kind }) => kind == "audiooutput")
         .map(({ deviceId, label }) => ({ id: deviceId, label }))
+    })
+  )
+
+  storage.local.get(["monitor_device", "master_device"], set_devices)
+  storage.onChanged.addListener(({ monitor_device, master_device }) =>
+    set_devices({
+      monitor_device: monitor_device && monitor_device.newValue,
+      master_device: master_device && master_device.newValue
     })
   )
 }

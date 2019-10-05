@@ -1,7 +1,15 @@
 import r from "redda/src"
-import { state, is_on, toggle, active_tab, devices } from "./state"
+import {
+  state,
+  is_on,
+  toggle,
+  active_tab,
+  devices,
+  set_master,
+  set_monitor
+} from "./state"
 
-const { nav, div, a, input, label, ul, li, span, img, select, option } = r.dom
+const { nav, div, a, input, label, span, img, select, option } = r.dom
 
 const switcher = state.conn(
   ({ is_on, active_tab }) => {
@@ -68,24 +76,51 @@ const attrs = () => [
   ]
 ]
 
-const device_select = is_master =>
-  state.conn(
-    ({ devices }) => [
-      div,
-      { class: "input-field" },
-      [
-        select,
+const device_select = is_master => {
+  const action = is_master ? set_master : set_monitor
+
+  return state.conn(
+    ({ is_on, devices }) => {
+      const { list, monitor, master } = devices || {}
+      const device_id = is_master ? master : monitor
+      return [
+        div,
+        { class: "input-field" },
         [
-          option,
-          { value: "", disabled: "disabled", selected: "selected" },
-          "Choose device"
+          select,
+          {
+            disabled: !is_on ? "disabled" : null,
+            onchange: ev => {
+              const id = ev.target.value
+
+              if (device_id != id) state.disp(action, id)
+            }
+          },
+          [
+            option,
+            {
+              value: "",
+              disabled: "disabled",
+              selected: !device_id ? "selected" : null
+            },
+            "Select device"
+          ],
+          ...list.map(({ id, label }) => [
+            option,
+            { value: id, selected: device_id == id ? "selected" : null },
+            label
+          ])
         ],
-        devices.map(({ id, label }) => [option, { value: id }, label])
-      ],
-      [label, is_master ? "Master" : "Monitor", " output device"]
-    ],
+        [label, `${is_master ? "Master" : "Monitor"} output device`]
+      ]
+    },
+    is_on,
     devices
   )
+}
+
+const monitor_select = device_select(false)
+const master_select = device_select(true)
 
 export const app = () => [
   div,
@@ -95,8 +130,8 @@ export const app = () => [
     div,
     { class: "container" },
     [div, { class: "section" }, [switcher]],
-    [div, { class: "section" }, [device_select(true)]],
-    [div, { class: "section" }, [device_select(false)]],
+    [div, { class: "section" }, [monitor_select]],
+    [div, { class: "section" }, [master_select]],
     [div, { class: "section" }, [attrs]]
   ]
 ]
