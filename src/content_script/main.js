@@ -26,6 +26,9 @@ const handle_message = message => {
   if (message.action == "off") return window.location.reload()
 }
 
+const is_src_mutation = mutations =>
+  !!mutations.find(m => m.attributeName == "src")
+
 const init_state = label => {
   const name = `player_${label}`
   const deck_doc = document.querySelector(`.deck-${label}`).contentDocument
@@ -41,6 +44,20 @@ const init_state = label => {
 
   state.disp(set_player, { [name]: player })
 
+  const observer = new MutationObserver(mutations => {
+    if (!is_src_mutation(mutations)) return
+
+    state.disp(set_monitor_src, {
+      [`src_${label}`]: player.captureStream()
+    })
+
+    state.disp(set_master_src, {
+      [`src_${label}`]: player.captureStream()
+    })
+  })
+
+  observer.observe(player, { attributes: true })
+
   state.disp(set_player_prop, {
     name: name,
     volume: 0,
@@ -48,18 +65,6 @@ const init_state = label => {
     src: player.src,
     crossorigin: true
   })
-
-  state.disp(set_monitor_src, {
-    [`src_${label}`]: player.captureStream()
-  })
-
-  state.disp(set_master_src, {
-    [`src_${label}`]: player.captureStream()
-  })
-
-  setTimeout(() =>
-    deck_doc.querySelector("ytd-playlist-panel-video-renderer").click()
-  )
 }
 
 const materialize = cb => {
