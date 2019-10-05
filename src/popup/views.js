@@ -1,13 +1,5 @@
 import r from "redda/src"
-import {
-  state,
-  is_on,
-  toggle,
-  active_tab,
-  devices,
-  set_master,
-  set_monitor
-} from "./state"
+import { state, is_on, toggle, active_tab, devices } from "./state"
 
 const { nav, div, a, input, label, span, img, select, option } = r.dom
 
@@ -62,7 +54,6 @@ const title_bar = () => [
 const attrs = () => [
   div,
   "Icons made by ",
-
   [
     a,
     { href: "https://www.flaticon.com/authors/freepik", title: "Freepik" },
@@ -76,51 +67,69 @@ const attrs = () => [
   ]
 ]
 
-const device_select = is_master => {
-  const action = is_master ? set_master : set_monitor
+const monitor_select = state.conn(
+  ({ is_on, devices }) => [
+    div,
+    { class: "input-field" },
+    [
+      select,
+      {
+        disabled: !is_on ? "disabled" : null,
+        onchange: ev =>
+          chrome.storage.local.set({ monitor_device: ev.target.value })
+      },
+      [
+        option,
+        {
+          value: "",
+          disabled: "disabled",
+          selected: !devices.monitor ? "selected" : null
+        },
+        "Select device"
+      ],
+      ...devices.list.map(({ id, label }) => [
+        option,
+        { value: id, selected: devices.monitor == id ? "selected" : null },
+        label
+      ])
+    ],
+    [label, "Monitor output device"]
+  ],
+  is_on,
+  devices
+)
 
-  return state.conn(
-    ({ is_on, devices }) => {
-      const { list, monitor, master } = devices || {}
-      const device_id = is_master ? master : monitor
-      return [
-        div,
-        { class: "input-field" },
-        [
-          select,
-          {
-            disabled: !is_on ? "disabled" : null,
-            onchange: ev => {
-              const id = ev.target.value
-
-              if (device_id != id) state.disp(action, id)
-            }
-          },
-          [
-            option,
-            {
-              value: "",
-              disabled: "disabled",
-              selected: !device_id ? "selected" : null
-            },
-            "Select device"
-          ],
-          ...list.map(({ id, label }) => [
-            option,
-            { value: id, selected: device_id == id ? "selected" : null },
-            label
-          ])
-        ],
-        [label, `${is_master ? "Master" : "Monitor"} output device`]
-      ]
-    },
-    is_on,
-    devices
-  )
-}
-
-const monitor_select = device_select(false)
-const master_select = device_select(true)
+const master_select = state.conn(
+  ({ is_on, devices }) => [
+    div,
+    { class: "input-field" },
+    [
+      select,
+      {
+        disabled: !is_on ? "disabled" : null,
+        onchange: ev =>
+          chrome.storage.local.set({ monitor_device: ev.target.value })
+      },
+      [
+        option,
+        {
+          value: "",
+          disabled: "disabled",
+          selected: !devices.master ? "selected" : null
+        },
+        "Select device"
+      ],
+      ...devices.list.map(({ id, label }) => [
+        option,
+        { value: id, selected: devices.master == id ? "selected" : null },
+        label
+      ])
+    ],
+    [label, "Master output device"]
+  ],
+  is_on,
+  devices
+)
 
 export const app = () => [
   div,

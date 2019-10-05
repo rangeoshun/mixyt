@@ -33,15 +33,5 @@ state.add(is_on, set_on, toggle)
 
 export const devices = () => ({ list: [], monitor: null, master: null })
 export const set_devices = (devices, list) => ({ ...devices, list })
-export const set_monitor = ({ monitor, ...devices }, device) => {
-  chrome.storage.local.set({ monitor_device: device })
-
-  return { ...devices, monitor: device }
-}
-export const set_master = ({ master, ...devices }, device) => {
-  chrome.storage.local.set({ master_device: device })
-
-  return { ...devices, master: device }
-}
 
 state.add(devices, set_devices, set_monitor, set_master)
