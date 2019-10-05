@@ -49,8 +49,6 @@ const init_state = label => {
     if (!is_src_mutation(mutations)) return
 
     const stream = player.captureStream()
-    const video = stream.getVideoTracks()[0]
-    stream.removeTrack(video)
 
     state.disp(set_monitor_src, {
       [`src_${label}`]: stream

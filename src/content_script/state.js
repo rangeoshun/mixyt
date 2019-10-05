@@ -23,12 +23,11 @@ const set_src = ({ out_a, out_b }, { src_a, src_b }) => {
 
 const set_device = ({ out_a, out_b }, device) => {
   if (out_a) {
-    out_a.pause()
     out_a.setSinkId(device)
     out_a.play()
   }
+
   if (out_b) {
-    out_b.pause()
     out_b.setSinkId(device)
     out_b.play()
   }
