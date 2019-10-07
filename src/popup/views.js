@@ -108,7 +108,7 @@ const master_select = state.conn(
       {
         disabled: !is_on ? "disabled" : null,
         onchange: ev =>
-          chrome.storage.local.set({ monitor_device: ev.target.value })
+          chrome.storage.local.set({ master_device: ev.target.value })
       },
       [
         option,

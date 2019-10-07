@@ -31,7 +31,19 @@ export const toggle = prev => {
 
 state.add(is_on, set_on, toggle)
 
-export const devices = () => ({ list: [], monitor: null, master: null })
+export const devices = () => ({
+  list: [],
+  monitor: "default",
+  master: "default"
+})
 export const set_devices = (devices, list) => ({ ...devices, list })
+export const set_monitor = ({ monitor, ...devices }, device) => ({
+  ...devices,
+  monitor: device
+})
+export const set_master = ({ master, ...devices }, device) => ({
+  ...devices,
+  master: device
+})
 
 state.add(devices, set_devices, set_monitor, set_master)
