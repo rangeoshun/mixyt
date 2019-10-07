@@ -21,7 +21,17 @@ const deck = name => () => [
 
 const output = name => () => [audio, { class: name }]
 
-const mixer = () => [div, { id: "mixer" }]
+const linear_pot = () => [
+  div,
+  { class: "pot-frame" },
+  [div, { class: "pot-knob" }]
+]
+
+const mixer = () => [
+  div,
+  { id: "mixer" },
+  [div, { class: "contorl-a" }, [linear_pot]]
+]
 
 export const app = () => [
   div,

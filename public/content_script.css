@@ -26,3 +26,18 @@ body {
 .ytp-spinner {
   display: none;
 }
+
+.pot-frame {
+  position: relative;
+  width: 50px;
+  height: 250px;
+  margin: 10px;
+  border: 1px dotted red;
+}
+
+.pot-knob {
+  position: absolute;
+  width: 50px;
+  height: 20px;
+  border: 1px dotted red;
+}
