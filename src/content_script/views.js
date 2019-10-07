@@ -21,16 +21,46 @@ const deck = name => () => [
 
 const output = name => () => [audio, { class: name }]
 
-const linear_pot = () => [
-  div,
-  { class: "pot-frame" },
-  [div, { class: "pot-knob" }]
-]
+const move_pot = name => ev => {
+  const knob = document.querySelector("." + name)
+  const frame = knob.parentNode
+  const top = (parseInt(knob.style.top) || 0) + (ev.movementY || ev.deltaY * -1)
+
+  if (top < 0 || top + knob.offsetHeight >= frame.offsetHeight) return
+
+  knob.style.top = top + "px"
+}
+
+const linear_pot = name => () => {
+  const handle_drag = move_pot(name)
+  const clear_handle = () => {
+    window.removeEventListener("mousemove", handle_drag)
+    window.removeEventListener("mouseup", clear_handle)
+  }
+
+  return [
+    div,
+    {
+      class: "pot-frame",
+      onwheel: handle_drag
+    },
+    [
+      div,
+      {
+        class: `pot-knob ${name}`,
+        onmousedown: ev => {
+          window.addEventListener("mousemove", handle_drag)
+          window.addEventListener("mouseup", clear_handle)
+        }
+      }
+    ]
+  ]
+}
 
 const mixer = () => [
   div,
   { id: "mixer" },
-  [div, { class: "contorl-a" }, [linear_pot]]
+  [div, { class: "contorl-a" }, [linear_pot("volume-a")]]
 ]
 
 export const app = () => [
