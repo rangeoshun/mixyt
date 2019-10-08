@@ -76,3 +76,36 @@ export const set_player = ({ player_a, player_b }, players) => ({
 export const set_player_prop = (players, props) => set_prop(players, props)
 
 state.add(players, set_player, set_player_prop)
+
+const deck_default = {
+  master: 0,
+  monitor: 1,
+  rate: 0.5,
+  bass: 0.5,
+  mid: 0.5,
+  hi: 0.5
+}
+
+export const mixer = () => ({
+  deck_a: deck_default,
+  deck_b: deck_default
+})
+
+export const set_deck = (
+  decks,
+  { name, master, monitor, rate, bass, mid, hi }
+) => {
+  console.log(name, master, monitor, rate)
+  let deck = decks[name]
+
+  if (master != undefined) deck = { ...deck, master }
+  if (monitor != undefined) deck = { ...deck, monitor }
+  if (rate != undefined) deck = { ...deck, rate }
+  if (bass != undefined) deck = { ...deck, bass }
+  if (mid != undefined) deck = { ...deck, mid }
+  if (hi != undefined) deck = { ...deck, hi }
+
+  return { ...decks, [name]: deck }
+}
+
+state.add(mixer, set_deck)

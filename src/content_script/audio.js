@@ -1,6 +1,8 @@
-export const connect_node = (src_stream, dest_elem) => {
-  const ac = new AudioContext()
-  const src = ac.createMediaStreamSource(src_stream)
+const ac = new AudioContext()
+
+export const get_source = src_stream => ac.createMediaStreamSource(src_stream)
+
+export const connect_node = (src, dest_elem) => {
   const dest = ac.createMediaStreamDestination()
   src.connect(dest)
 

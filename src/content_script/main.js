@@ -14,6 +14,8 @@ import {
   set_monitor_device
 } from "./state"
 
+import { get_source } from "./audio"
+
 const runtime = chrome.runtime
 const storage = chrome.storage
 const body = document.body
@@ -37,11 +39,11 @@ const init_state = label => {
   const player = () => deck_doc().querySelector("video")
 
   state.disp(set_monitor, {
-    [`out_${label}`]: document.querySelector(`.monitor-${label}`)
+    [`out_${label}`]: document.querySelector(`audio.monitor-${label}`)
   })
 
   state.disp(set_master, {
-    [`out_${label}`]: document.querySelector(`.master-${label}`)
+    [`out_${label}`]: document.querySelector(`audio.master-${label}`)
   })
 
   state.disp(set_player, { [name]: player() })
@@ -53,20 +55,17 @@ const init_state = label => {
   })
 
   const handle_canplay = () => {
-    const stream = player().captureStream()
-    debugger
+    const source = get_source(player().captureStream())
+
     state.disp(set_player, { [name]: player() })
 
     state.disp(set_monitor_src, {
-      [`src_${label}`]: stream
+      [`src_${label}`]: source
     })
 
     state.disp(set_master_src, {
-      [`src_${label}`]: stream
+      [`src_${label}`]: source
     })
-
-    player().removeEventListener("canplay", handle_canplay)
-    setTimeout(() => player().addEventListener("canplay", handle_canplay))
   }
 
   observer.observe(player(), { attributes: true })
@@ -99,6 +98,30 @@ const init = () => {
 
   const app_cont = document.getElementById("app-cont")
   const render_app = r.render(app_cont, [app])
+
+  let prev = state.get()
+
+  state.on_change(() => {
+    const curr = state.get()
+    console.log(curr.mixer.deck_a)
+    ;["deck_a", "deck_b"].forEach(deck_name => {
+      const deck = curr.mixer[deck_name]
+      const label = deck_name.split("_")[1]
+
+      if (!isNaN(deck.rate) && deck.rate != prev.mixer[deck_name].rate)
+        state.disp(set_player_prop, {
+          name: "player_" + label,
+          rate: 1 + (0.5 - deck.rate) * 0.08
+        })
+      ;["monitor", "master"].forEach(out_name => {
+        if (deck[out_name] == prev.mixer[deck_name][out_name]) return
+        document.querySelector(`audio.${out_name}-${label}`).volume =
+          deck[out_name]
+      })
+    })
+
+    prev = curr
+  })
 
   runtime.onMessage.addListener(handle_message)
 
