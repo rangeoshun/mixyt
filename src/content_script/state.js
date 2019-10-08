@@ -10,8 +10,8 @@ const set_out = ({ out_a, out_b }, next) => ({
 })
 
 const set_src = ({ out_a, out_b, src_a, src_b }, input) => {
-  if (out_a && input.src_a) src_a = connect_node(input.src_a, out_a)
-  if (out_b && input.src_b) src_b = connect_node(input.src_b, out_b)
+  if (out_a && input.src_a) src_a = connect_node("out_a", input.src_a, out_a)
+  if (out_b && input.src_b) src_b = connect_node("out_b", input.src_b, out_b)
 
   return { out_a, out_b, src_a, src_b }
 }
@@ -95,7 +95,6 @@ export const set_deck = (
   decks,
   { name, master, monitor, rate, bass, mid, hi }
 ) => {
-  console.log(name, master, monitor, rate)
   let deck = decks[name]
 
   if (master != undefined) deck = { ...deck, master }

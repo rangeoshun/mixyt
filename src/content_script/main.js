@@ -14,7 +14,7 @@ import {
   set_monitor_device
 } from "./state"
 
-import { get_source } from "./audio"
+import { filter_chains, get_source } from "./audio"
 
 const runtime = chrome.runtime
 const storage = chrome.storage
@@ -34,16 +34,18 @@ const is_src_mutation = mutations =>
 
 const init_state = label => {
   const name = `player_${label}`
+  const out_name = `out_${label}`
+  const src_name = `src_${label}`
   const deck_doc = () =>
     document.querySelector(`.deck-${label}`).contentDocument
   const player = () => deck_doc().querySelector("video")
 
   state.disp(set_monitor, {
-    [`out_${label}`]: document.querySelector(`audio.monitor-${label}`)
+    [out_name]: document.querySelector(`audio.monitor-${label}`)
   })
 
   state.disp(set_master, {
-    [`out_${label}`]: document.querySelector(`audio.master-${label}`)
+    [out_name]: document.querySelector(`audio.master-${label}`)
   })
 
   state.disp(set_player, { [name]: player() })
@@ -55,16 +57,16 @@ const init_state = label => {
   })
 
   const handle_canplay = () => {
-    const source = get_source(player().captureStream())
+    const source = get_source(out_name, player().captureStream())
 
     state.disp(set_player, { [name]: player() })
 
     state.disp(set_monitor_src, {
-      [`src_${label}`]: source
+      [src_name]: source
     })
 
     state.disp(set_master_src, {
-      [`src_${label}`]: source
+      [src_name]: source
     })
   }
 
@@ -101,7 +103,7 @@ const init = () => {
 
   let prev = state.get()
 
-  state.on_change(() => {
+  const update_decks = () => {
     const curr = state.get()
     console.log(curr.mixer.deck_a)
     ;["deck_a", "deck_b"].forEach(deck_name => {
@@ -118,10 +120,19 @@ const init = () => {
         document.querySelector(`audio.${out_name}-${label}`).volume =
           deck[out_name]
       })
+      ;["bass", "mid", "hi"].forEach(eq_name => {
+        const chain_name = "out_" + label
+        if (deck[eq_name] == prev.mixer[deck_name][eq_name]) return
+        filter_chains[chain_name][eq_name].gain.value =
+          (0.5 - deck[eq_name]) * -80
+      })
     })
 
     prev = curr
-  })
+  }
+
+  state.on_change(update_decks)
+  update_decks()
 
   runtime.onMessage.addListener(handle_message)
 

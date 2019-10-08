@@ -119,9 +119,9 @@ const controls = (name, deck) => [
   { class: `${name} controls` },
   [linear_pot(deck, "rate")],
   [radial_pot(deck, "monitor")],
-  [radial_pot(deck, "bass")],
-  [radial_pot(deck, "mid")],
   [radial_pot(deck, "hi")],
+  [radial_pot(deck, "mid")],
+  [radial_pot(deck, "bass")],
   [linear_pot(deck, "master")]
 ]
 

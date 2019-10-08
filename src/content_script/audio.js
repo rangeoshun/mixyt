@@ -1,12 +1,43 @@
-const ac = new AudioContext()
+const contexts = {}
+const create_context = name => (contexts[name] = new AudioContext())
 
-export const get_source = src_stream => ac.createMediaStreamSource(src_stream)
+export const filter_chains = {}
+const create_eq_chain = name => {
+  const ac = contexts[name]
 
-export const connect_node = (src, dest_elem) => {
+  const bass = ac.createBiquadFilter()
+  const mid = ac.createBiquadFilter()
+  const hi = ac.createBiquadFilter()
+
+  bass.type = "lowshelf"
+  mid.type = "peaking"
+  hi.type = "highshelf"
+
+  bass.connect(mid)
+  mid.connect(hi)
+
+  const chain = {
+    bass,
+    mid,
+    hi
+  }
+
+  filter_chains[name] = chain
+
+  return chain
+}
+
+export const get_source = (name, src_stream) =>
+  (contexts[name] || create_context(name)).createMediaStreamSource(src_stream)
+
+export const connect_node = (name, src, dest_elem) => {
+  const ac = contexts[name] || create_context(name)
   const dest = ac.createMediaStreamDestination()
-  src.connect(dest)
+  const eq = filter_chains[name] || create_eq_chain(name)
+
+  src.connect(eq.bass)
+  eq.hi.connect(dest)
 
   dest_elem.srcObject = dest.stream
   dest_elem.play()
-  return ac
 }

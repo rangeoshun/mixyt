@@ -3,6 +3,10 @@ html {
   height: 100%;
 }
 
+* {
+  user-select: none;
+}
+
 body {
   height: 100%;
   margin: 0;
@@ -31,7 +35,7 @@ body {
 }
 
 .deck {
-  width: 480px;
+  width: 700px;
   height: 100%;
 }
 
@@ -49,6 +53,7 @@ body {
 .pot-knob {
   position: absolute;
   border: 1px dotted red;
+  cursor: pointer;
 }
 
 .pot-knob.linear {
