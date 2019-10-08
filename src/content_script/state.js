@@ -1,5 +1,7 @@
 import r from "redda/src"
 
+import { connect_node } from "./audio"
+
 export const state = r.state()
 
 const set_out = ({ out_a, out_b }, next) => ({
@@ -7,30 +9,16 @@ const set_out = ({ out_a, out_b }, next) => ({
   out_b: next.out_b || out_b
 })
 
-const set_src = ({ out_a, out_b }, { src_a, src_b }) => {
-  if (out_a && src_a) {
-    out_a.srcObject = src_a
-    out_a.play()
-  }
+const set_src = ({ out_a, out_b, src_a, src_b }, input) => {
+  if (out_a && input.src_a) src_a = connect_node(input.src_a, out_a)
+  if (out_b && input.src_b) src_b = connect_node(input.src_b, out_b)
 
-  if (out_b && src_b) {
-    out_b.srcObject = src_b
-    out_b.play()
-  }
-
-  return { out_a, out_b }
+  return { out_a, out_b, src_a, src_b }
 }
 
 const set_device = ({ out_a, out_b }, device) => {
-  if (out_a) {
-    out_a.setSinkId(device)
-    out_a.play()
-  }
-
-  if (out_b) {
-    out_b.setSinkId(device)
-    out_b.play()
-  }
+  if (out_a) out_a.setSinkId(device)
+  if (out_b) out_b.setSinkId(device)
 
   return { out_a, out_b, device }
 }

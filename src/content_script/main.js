@@ -32,8 +32,9 @@ const is_src_mutation = mutations =>
 
 const init_state = label => {
   const name = `player_${label}`
-  const deck_doc = document.querySelector(`.deck-${label}`).contentDocument
-  const player = deck_doc.querySelector("video")
+  const deck_doc = () =>
+    document.querySelector(`.deck-${label}`).contentDocument
+  const player = () => deck_doc().querySelector("video")
 
   state.disp(set_monitor, {
     [`out_${label}`]: document.querySelector(`.monitor-${label}`)
@@ -43,12 +44,18 @@ const init_state = label => {
     [`out_${label}`]: document.querySelector(`.master-${label}`)
   })
 
-  state.disp(set_player, { [name]: player })
+  state.disp(set_player, { [name]: player() })
 
   const observer = new MutationObserver(mutations => {
     if (!is_src_mutation(mutations)) return
 
-    const stream = player.captureStream()
+    player().addEventListener("canplay", handle_canplay)
+  })
+
+  const handle_canplay = () => {
+    const stream = player().captureStream()
+    debugger
+    state.disp(set_player, { [name]: player() })
 
     state.disp(set_monitor_src, {
       [`src_${label}`]: stream
@@ -57,15 +64,18 @@ const init_state = label => {
     state.disp(set_master_src, {
       [`src_${label}`]: stream
     })
-  })
 
-  observer.observe(player, { attributes: true })
+    player().removeEventListener("canplay", handle_canplay)
+    setTimeout(() => player().addEventListener("canplay", handle_canplay))
+  }
+
+  observer.observe(player(), { attributes: true })
 
   state.disp(set_player_prop, {
     name: name,
     volume: 0,
     muted: false,
-    src: player.src,
+    src: player().src,
     crossorigin: true
   })
 }
