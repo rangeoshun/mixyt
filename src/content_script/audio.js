@@ -10,8 +10,11 @@ const create_eq_chain = name => {
   const hi = ac.createBiquadFilter()
 
   bass.type = "lowshelf"
+  bass.frequency.value = 200
   mid.type = "peaking"
+  mid.frequency.value = 1200
   hi.type = "highshelf"
+  hi.frequency.value = 3500
 
   bass.connect(mid)
   mid.connect(hi)
