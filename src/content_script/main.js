@@ -50,12 +50,6 @@ const init_state = label => {
 
   state.disp(set_player, { [name]: player() })
 
-  const observer = new MutationObserver(mutations => {
-    if (!is_src_mutation(mutations)) return
-
-    player().addEventListener("canplay", handle_canplay)
-  })
-
   const handle_canplay = () => {
     const source = get_source(out_name, player().captureStream())
 
@@ -70,15 +64,11 @@ const init_state = label => {
     })
   }
 
-  observer.observe(player(), { attributes: true })
-
-  state.disp(set_player_prop, {
-    name: name,
-    volume: 0,
-    muted: false,
-    src: player().src,
-    crossorigin: true
-  })
+  player().volume = 0
+  player().muted = true
+  player().pause()
+  handle_canplay()
+  player().addEventListener("canplay", handle_canplay)
 }
 
 const materialize = cb => {
@@ -105,7 +95,6 @@ const init = () => {
 
   const update_decks = () => {
     const curr = state.get()
-    console.log(curr.mixer.deck_a)
     ;["deck_a", "deck_b"].forEach(deck_name => {
       const deck = curr.mixer[deck_name]
       const label = deck_name.split("_")[1]
