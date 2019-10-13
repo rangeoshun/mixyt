@@ -20,7 +20,7 @@ export const set_tab_active = (tab, is_active) => {
 state.add(active_tab, set_tab, set_tab_active)
 
 export const is_on = () => false
-export const set_on = (_, val) => val
+export const turn_on = (_, val) => val
 export const toggle = prev => {
   const is_active = !prev
 
