@@ -12,9 +12,10 @@ import {
 window.s = state
 const runtime = chrome.runtime
 const storage = chrome.storage
+const tabs = chrome.tabs
 
 const store_tab = tab =>
-  tab && (state.disp(set_tab, tab), state.disp(set_on, !!tab.is_active))
+  tab && (state.disp(set_tab, tab), state.disp(turn_on, !!tab.is_active))
 
 const handle_devices = (devices = []) => state.disp(set_devices, devices)
 
@@ -33,10 +34,15 @@ const init = () => {
   runtime.onMessage.addListener((message, sender) => {
     if (sender.id != chrome.runtime.id) return
 
-    if (message.action == "set_active") store_tab(message.active_tab)
+    if (message.action == "set_active") {
+      const { active_tab } = message
+      store_tab(active_tab)
+      tabs.sendMessage(active_tab.id, { action: "update_devices" })
+    }
   })
 
   runtime.sendMessage(runtime.id, { action: "get_active" })
+
   storage.local.get(
     ["devices", "monitor_device", "master_device"],
     ({ devices, monitor_device, master_device }) => {
@@ -45,6 +51,7 @@ const init = () => {
       if (master_device) state.disp(set_master, master_device)
     }
   )
+
   storage.onChanged.addListener(
     changes =>
       changes && changes.devices && handle_devices(changes.devices.newValue)

@@ -84,10 +84,14 @@ const handle_message = (message, sender) => {
   if (message.action == "get_active") return send_active_tab()
 }
 
-const convert_native_tab = tab_ => ({
-  ...convert_tab(tab_),
-  ...(tab_exists(tab_) || {})
-})
+const convert_native_tab = tab_ => {
+  const old_tab = tab_exists(tab_) || {}
+  const new_tab = convert_tab(tab_)
+  return {
+    ...new_tab,
+    ...old_tab
+  }
+}
 
 const set_active_tab = tab => state.disp(set_active, tab.id)
 

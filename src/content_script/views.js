@@ -26,9 +26,10 @@ const output = name => () => [audio, { class: name }]
 const move_pot = (klass, dest, role) => ev => {
   const knob = document.querySelector("." + klass)
   const frame = knob.parentNode
-  const top = (parseInt(knob.style.top) || 0) + (ev.movementY || ev.deltaY * -1)
+  let top = (parseInt(knob.style.top) || 0) + (ev.movementY || ev.deltaY * -1)
 
-  if (top < 10 || top > 240) return
+  if (top < 10) top = 10
+  else if (top > 240) top = 240
 
   knob.style.top = top + "px"
   state.disp(set_deck, { name: dest, [role]: 1 - (top - 10) / 230 })
@@ -68,11 +69,12 @@ const linear_pot = (dest, role) =>
 const rotate_pot = (klass, dest, role) => ev => {
   const knob = document.querySelector("." + klass)
   const frame = knob.parentNode
-  const ang =
+  let ang =
     (parseInt(knob.style.transform.split("(")[1]) || 0) -
     (ev.movementY || ev.deltaY * -1)
 
-  if (ang < -135 || ang > 135) return
+  if (ang < -135) ang = -135
+  else if (ang > 135) ang = 135
 
   knob.style.transform = `rotateZ(${ang}deg)`
   state.disp(set_deck, {

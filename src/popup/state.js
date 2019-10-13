@@ -37,13 +37,11 @@ export const devices = () => ({
   master: "default"
 })
 export const set_devices = (devices, list) => ({ ...devices, list })
-export const set_monitor = ({ monitor, ...devices }, device) => ({
+const set_device = role => (devices, device) => ({
   ...devices,
-  monitor: device
+  [role]: devices.list.find(({ id }) => id == device) ? device : "default"
 })
-export const set_master = ({ master, ...devices }, device) => ({
-  ...devices,
-  master: device
-})
+export const set_monitor = set_device("monitor")
+export const set_master = set_device("master")
 
 state.add(devices, set_devices, set_monitor, set_master)

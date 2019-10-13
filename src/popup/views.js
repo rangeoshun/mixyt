@@ -1,5 +1,5 @@
 import r from "redda/src"
-import { state, is_on, toggle, active_tab, devices } from "./state"
+import { state, is_on, turn_on, active_tab, devices } from "./state"
 
 const { nav, div, a, input, label, span, img, select, option } = r.dom
 
@@ -21,7 +21,9 @@ const switcher = state.conn(
             type: "checkbox",
             disabled: !active_tab.is_youtube ? "disabled" : null,
             checked: is_on ? "checked" : null,
-            onclick: active_tab.is_youtube ? () => state.disp(toggle) : null
+            onchange: active_tab.is_youtube
+              ? ev => state.disp(turn_on, ev.target.value)
+              : null
           }
         ],
         [span, { class: "lever" }],

@@ -25,8 +25,18 @@ const clear_frame = () => (
   (body.innerHTML = '<div id="app-cont" />'), (head.innerHTML = "")
 )
 
+const update_devices = () =>
+  navigator.mediaDevices.enumerateDevices().then(devs =>
+    storage.local.set({
+      devices: devs
+        .filter(({ kind }) => kind == "audiooutput")
+        .map(({ deviceId, label }) => ({ id: deviceId, label }))
+    })
+  )
+
 const handle_message = message => {
   if (message.action == "off") return window.location.reload()
+  if (message.action == "update_devices") return update_devices()
 }
 
 const is_src_mutation = mutations =>
@@ -66,6 +76,7 @@ const init_state = label => {
 
   player().volume = 0
   player().muted = true
+  player().crossOrigin = true
   player().pause()
   handle_canplay()
   player().addEventListener("canplay", handle_canplay)
@@ -85,6 +96,8 @@ const set_devices = ({ monitor_device, master_device } = {}) => {
 }
 
 const init = () => {
+  if (location.href.match("mixyt_role")) return
+
   clear_frame()
   materialize()
 
@@ -95,6 +108,7 @@ const init = () => {
 
   const update_decks = () => {
     const curr = state.get()
+    // console.log(curr.mixer.deck_a)
     ;["deck_a", "deck_b"].forEach(deck_name => {
       const deck = curr.mixer[deck_name]
       const label = deck_name.split("_")[1]
@@ -127,14 +141,6 @@ const init = () => {
 
   document.querySelector(".deck-a").contentWindow.onload = () => init_state("a")
   document.querySelector(".deck-b").contentWindow.onload = () => init_state("b")
-
-  navigator.mediaDevices.enumerateDevices().then(devs =>
-    storage.local.set({
-      devices: devs
-        .filter(({ kind }) => kind == "audiooutput")
-        .map(({ deviceId, label }) => ({ id: deviceId, label }))
-    })
-  )
 
   storage.local.get(["monitor_device", "master_device"], set_devices)
   storage.onChanged.addListener(({ monitor_device, master_device }) =>
