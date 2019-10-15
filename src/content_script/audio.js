@@ -1,5 +1,9 @@
 const contexts = {}
-const create_context = name => (contexts[name] = new AudioContext())
+const create_context = name =>
+  (contexts[name] = new AudioContext({
+    latencyHint: "playback",
+    sampleRate: 48000
+  }))
 
 export const filter_chains = {}
 const create_eq_chain = name => {
