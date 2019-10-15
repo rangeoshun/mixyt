@@ -3,7 +3,7 @@ import { app } from "./views"
 import {
   state,
   set_tab,
-  set_on,
+  turn_on,
   set_devices,
   set_monitor,
   set_master
@@ -26,9 +26,7 @@ const init = () => {
 
   state.on_change(() => {
     render_app()
-    setTimeout(() => {
-      M.FormSelect.init(document.querySelectorAll("select"))
-    })
+    M.FormSelect.init(document.querySelectorAll("select"))
   })
 
   runtime.onMessage.addListener((message, sender) => {
