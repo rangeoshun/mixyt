@@ -20,7 +20,12 @@ export const set_tab_active = (tab, is_active) => {
 state.add(active_tab, set_tab, set_tab_active)
 
 export const is_on = () => false
-export const turn_on = (_, val) => val
+export const turn_on = (_, is_active) => {
+  state.disp(set_tab_active, is_active)
+
+  return is_active
+}
+
 export const toggle = prev => {
   const is_active = !prev
 
@@ -29,7 +34,7 @@ export const toggle = prev => {
   return is_active
 }
 
-state.add(is_on, set_on, toggle)
+state.add(is_on, turn_on, toggle)
 
 export const devices = () => ({
   list: [],
