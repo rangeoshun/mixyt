@@ -20,9 +20,9 @@ const switcher = state.conn(
           {
             type: "checkbox",
             disabled: !active_tab.is_youtube ? "disabled" : null,
-            checked: is_on ? "checked" : null,
+            checked: active_tab.is_active ? "checked" : null,
             onchange: active_tab.is_youtube
-              ? ev => state.disp(turn_on, ev.target.value)
+              ? ev => state.disp(turn_on, ev.target.checked)
               : null
           }
         ],
