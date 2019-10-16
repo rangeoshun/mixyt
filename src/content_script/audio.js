@@ -35,6 +35,10 @@ const create_eq_chain = name => {
   return chain
 }
 
+export const cross_gains = {}
+const create_cross_gain = name =>
+  (cross_gains[name] = contexts[name].createGain())
+
 export const get_source = (name, src_stream) =>
   (contexts[name] || create_context(name)).createMediaStreamSource(src_stream)
 
@@ -42,9 +46,11 @@ export const connect_node = (name, src, dest_elem) => {
   const ac = contexts[name] || create_context(name)
   const dest = ac.createMediaStreamDestination()
   const eq = filter_chains[name] || create_eq_chain(name)
+  const gain = cross_gains[name] || create_cross_gain(name)
 
   src.connect(eq.bass)
-  eq.hi.connect(dest)
+  eq.hi.connect(gain)
+  gain.connect(dest)
 
   dest_elem.srcObject = dest.stream
   dest_elem.play()

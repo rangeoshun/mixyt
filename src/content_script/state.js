@@ -78,8 +78,8 @@ export const set_player_prop = (players, props) => set_prop(players, props)
 state.add(players, set_player, set_player_prop)
 
 const deck_default = {
-  master: 0,
-  monitor: 1,
+  master: 1,
+  monitor: 0.5,
   rate: 0.5,
   bass: 0.5,
   mid: 0.5,
@@ -88,12 +88,15 @@ const deck_default = {
 
 export const mixer = () => ({
   deck_a: deck_default,
-  deck_b: deck_default
+  deck_b: deck_default,
+  both: {
+    crossfade: 0.5
+  }
 })
 
 export const set_deck = (
   decks,
-  { name, master, monitor, rate, bass, mid, hi }
+  { name, master, monitor, rate, bass, mid, hi, crossfade }
 ) => {
   let deck = decks[name]
 
@@ -103,6 +106,7 @@ export const set_deck = (
   if (bass != undefined) deck = { ...deck, bass }
   if (mid != undefined) deck = { ...deck, mid }
   if (hi != undefined) deck = { ...deck, hi }
+  if (crossfade != undefined) deck = { ...deck, crossfade }
 
   return { ...decks, [name]: deck }
 }

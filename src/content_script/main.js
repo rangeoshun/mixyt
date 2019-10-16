@@ -14,7 +14,7 @@ import {
   set_monitor_device
 } from "./state"
 
-import { filter_chains, get_source } from "./audio"
+import { filter_chains, get_source, cross_gains } from "./audio"
 
 const runtime = chrome.runtime
 const storage = chrome.storage
@@ -108,12 +108,13 @@ const init = () => {
 
   const update_decks = () => {
     const curr = state.get()
-    // console.log(curr.mixer.deck_a)
     ;["deck_a", "deck_b"].forEach(deck_name => {
       const deck = curr.mixer[deck_name]
+      const { crossfade } = curr.mixer.both
       const label = deck_name.split("_")[1]
+      const out_name = "out_" + label
 
-      if (!isNaN(deck.rate) && deck.rate != prev.mixer[deck_name].rate)
+      if (deck.rate != prev.mixer[deck_name].rate)
         state.disp(set_player_prop, {
           name: "player_" + label,
           rate: 1 + (0.5 - deck.rate) * 0.08
@@ -124,11 +125,16 @@ const init = () => {
           deck[out_name]
       })
       ;["bass", "mid", "hi"].forEach(eq_name => {
-        const chain_name = "out_" + label
         if (deck[eq_name] == prev.mixer[deck_name][eq_name]) return
-        filter_chains[chain_name][eq_name].gain.value =
+        filter_chains[out_name][eq_name].gain.value =
           (0.5 - deck[eq_name]) * -80
       })
+      if (crossfade != prev.mixer.both.crossfade) {
+        const fader = deck_name == "deck_a" ? crossfade : 1 - crossfade
+
+        cross_gains[out_name].gain.value = Math.log(1 + fader * 1.719)
+        console.log(Math.log(1 + fader * 1.719))
+      }
     })
 
     prev = curr

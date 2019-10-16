@@ -26,7 +26,8 @@ const output = name => () => [audio, { class: name }]
 const move_pot = (klass, dest, role) => ev => {
   const knob = document.querySelector("." + klass)
   const frame = knob.parentNode
-  let top = (parseInt(knob.style.top) || 0) + (ev.movementY || ev.deltaY * -1)
+  const movement = -ev.deltaY || ev.movementY
+  let top = (parseInt(knob.style.top) || 0) + movement
 
   if (top < 10) top = 10
   else if (top > 240) top = 240
@@ -55,7 +56,53 @@ const linear_pot = (dest, role) =>
         div,
         {
           class: `pot-knob linear ${klass}`,
-          style: { top: 240 - mixer.deck_a[role] * 240 + "px" },
+          style: { top: 10 + (230 - mixer[dest][role] * 230) + "px" },
+          onmousedown: ev => {
+            window.addEventListener("mousemove", handle_drag)
+            window.addEventListener("mouseup", clear_handle)
+          }
+        }
+      ],
+      [span, role.toUpperCase()]
+    ]
+  }, mixer)
+
+const hor_move_pot = (klass, dest, role) => ev => {
+  ev.preventDefault()
+
+  const knob = document.querySelector("." + klass)
+  const frame = knob.parentNode
+  const movement = -ev.deltaX || ev.movementX
+  let left = (parseInt(knob.style.left) || 0) + movement
+
+  if (left < 10) left = 10
+  else if (left > 110) left = 110
+
+  knob.style.left = left + "px"
+  state.disp(set_deck, { name: dest, [role]: 1 - (left - 10) / 100 })
+}
+
+const hor_linear_pot = (dest, role) =>
+  state.conn(({ mixer }) => {
+    const klass = `${dest}-${role}`
+    const handle_drag = hor_move_pot(klass, dest, role)
+
+    const clear_handle = () => {
+      window.removeEventListener("mousemove", handle_drag)
+      window.removeEventListener("mouseup", clear_handle)
+    }
+
+    return [
+      div,
+      {
+        class: "pot-frame linear horizontal",
+        onwheel: handle_drag
+      },
+      [
+        div,
+        {
+          class: `pot-knob linear ${klass}`,
+          style: { left: 10 + (100 - mixer[dest][role] * 100) + "px" },
           onmousedown: ev => {
             window.addEventListener("mousemove", handle_drag)
             window.addEventListener("mouseup", clear_handle)
@@ -104,7 +151,7 @@ const radial_pot = (dest, role) =>
         {
           class: `pot-knob radial ${klass}`,
           style: {
-            transform: `rotateZ(${(mixer.deck_a[role] - 0.5) * 270}deg)`
+            transform: `rotateZ(${(mixer[dest][role] - 0.5) * 270}deg)`
           },
           onmousedown: ev => {
             window.addEventListener("mousemove", handle_drag)
@@ -131,7 +178,7 @@ const mixer_cont = () => [
   div,
   { id: "mixer" },
   [controls("controls-a", "deck_a")],
-  [div, { class: "controls-spacer" }],
+  [div, { class: "controls-spacer" }, [hor_linear_pot("both", "crossfade")]],
   [controls("controls-b", "deck_b")]
 ]
 
