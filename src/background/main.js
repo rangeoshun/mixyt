@@ -113,9 +113,9 @@ const handle_update = (id, change, tab_) => {
   const tab = convert_native_tab(tab_)
   const active_tab = get_active_tab()
 
-  store_tab(tab)
+  if (active_tab.is_youtube == tab.is_youtube) return
 
-  if (active_tab.id != id || !active_tab.is_youtube) return
+  store_tab(tab)
 }
 
 const CORS_HEADER_NAME = "Access-Control-Allow-Origin"
