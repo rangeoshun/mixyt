@@ -73,6 +73,7 @@ const monitor_select = state.conn(
   ({ is_on, devices }) => [
     div,
     { class: "input-field" },
+    [label, "Monitor output device"],
     [
       select,
       {
@@ -94,8 +95,7 @@ const monitor_select = state.conn(
         { value: id, selected: devices.monitor == id ? "selected" : null },
         label
       ])
-    ],
-    [label, "Monitor output device"]
+    ]
   ],
   is_on,
   devices
@@ -105,6 +105,7 @@ const master_select = state.conn(
   ({ is_on, devices }) => [
     div,
     { class: "input-field" },
+    [label, "Master output device"],
     [
       select,
       {
@@ -126,8 +127,7 @@ const master_select = state.conn(
         { value: id, selected: devices.master == id ? "selected" : null },
         label
       ])
-    ],
-    [label, "Master output device"]
+    ]
   ],
   is_on,
   devices
@@ -141,8 +141,7 @@ export const app = () => [
     div,
     { class: "container" },
     [div, { class: "section" }, [switcher]],
-    [div, { class: "section" }, [monitor_select]],
-    [div, { class: "section" }, [master_select]],
+    [div, { class: "section" }, [monitor_select], [master_select]],
     [div, { class: "section" }, [attrs]]
   ]
 ]

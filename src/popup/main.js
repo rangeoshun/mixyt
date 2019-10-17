@@ -22,11 +22,11 @@ const handle_devices = (devices = []) => state.disp(set_devices, devices)
 const init = () => {
   const app_cont = document.getElementById("app-cont")
   const render_app = r.render(app_cont, [app])
-  M.FormSelect.init(document.querySelectorAll("select"))
+  // M.FormSelect.init(document.querySelectorAll("select"))
 
   state.on_change(() => {
     render_app()
-    M.FormSelect.init(document.querySelectorAll("select"))
+    // M.FormSelect.init(document.querySelectorAll("select"))
   })
 
   runtime.onMessage.addListener((message, sender) => {

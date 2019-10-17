@@ -1,10 +1,20 @@
-body { width: 300px; }
+body {
+  width: 300px;
+}
 
 .brand-logo img {
-    margin-top: 12px;
+  margin-top: 12px;
 }
 
 .brand-logo span {
-    vertical-align: top;
-    margin-left: 6px;
+  vertical-align: top;
+  margin-left: 6px;
+}
+
+select {
+  display: block;
+}
+
+.input-field > label {
+  position: relative;
 }
