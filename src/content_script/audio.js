@@ -2,7 +2,7 @@ const contexts = {}
 const create_context = name =>
   (contexts[name] = new AudioContext({
     latencyHint: "playback",
-    sampleRate: 48000
+    sampleRate: 44100
   }))
 
 const destinations = {}
