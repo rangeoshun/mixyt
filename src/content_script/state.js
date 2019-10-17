@@ -9,9 +9,11 @@ const set_out = ({ out_a, out_b }, next) => ({
   out_b: next.out_b || out_b
 })
 
-const set_src = ({ out_a, out_b, src_a, src_b }, input) => {
-  if (out_a && input.src_a) src_a = connect_node("out_a", input.src_a, out_a)
-  if (out_b && input.src_b) src_b = connect_node("out_b", input.src_b, out_b)
+const set_src = ({ out_a, out_b, src_a, src_b }, input, role) => {
+  if (out_a && input.src_a)
+    src_a = connect_node("out_a", input.src_a, out_a, role)
+  if (out_b && input.src_b)
+    src_b = connect_node("out_b", input.src_b, out_b, role)
 
   return { out_a, out_b, src_a, src_b }
 }
@@ -43,7 +45,7 @@ export const monitor = () => ({
 
 export const set_monitor = (prev, next) => set_out(prev, next)
 
-export const set_monitor_src = (chan, src) => set_src(chan, src)
+export const set_monitor_src = (chan, src) => set_src(chan, src, "monitor")
 
 export const set_monitor_device = (chan, device) => set_device(chan, device)
 
@@ -57,7 +59,7 @@ export const master = () => ({
 
 export const set_master = (prev, next) => set_out(prev, next)
 
-export const set_master_src = (chan, src) => set_src(chan, src)
+export const set_master_src = (chan, src) => set_src(chan, src, "master")
 
 export const set_master_device = (chan, device) => set_device(chan, device)
 
