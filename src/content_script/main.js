@@ -133,7 +133,6 @@ const init = () => {
         const fader = deck_name == "deck_a" ? crossfade : 1 - crossfade
 
         cross_gains[out_name].gain.value = Math.log(1 + fader * 1.719)
-        console.log(Math.log(1 + fader * 1.719))
       }
     })
 
