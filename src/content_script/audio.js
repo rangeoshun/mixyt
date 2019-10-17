@@ -5,6 +5,12 @@ const create_context = name =>
     sampleRate: 48000
   }))
 
+const destinations = {}
+const create_destination = (name, role) =>
+  (destinations[`${name}_${role}`] = contexts[
+    name
+  ].createMediaStreamDestination())
+
 export const filter_chains = {}
 const create_eq_chain = name => {
   const ac = contexts[name]
@@ -42,15 +48,19 @@ const create_cross_gain = name =>
 export const get_source = (name, src_stream) =>
   (contexts[name] || create_context(name)).createMediaStreamSource(src_stream)
 
-export const connect_node = (name, src, dest_elem) => {
+export const connect_node = (name, src, dest_elem, role) => {
   const ac = contexts[name] || create_context(name)
-  const dest = ac.createMediaStreamDestination()
+  const dest = destinations[`${name}_${role}`] || create_destination(name, role)
   const eq = filter_chains[name] || create_eq_chain(name)
   const gain = cross_gains[name] || create_cross_gain(name)
 
   src.connect(eq.bass)
-  eq.hi.connect(gain)
-  gain.connect(dest)
+  if (role == "master") {
+    eq.hi.connect(gain)
+    gain.connect(dest)
+  } else if (role == "monitor") {
+    eq.hi.connect(dest)
+  }
 
   dest_elem.srcObject = dest.stream
   dest_elem.play()
