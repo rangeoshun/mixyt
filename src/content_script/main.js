@@ -46,42 +46,53 @@ const init_state = (label) => {
   const name = `player_${label}`
   const out_name = `out_${label}`
   const src_name = `src_${label}`
-  const deck_doc = () =>
-    document.querySelector(`.deck-${label}`).contentDocument
-  const player = () => deck_doc().querySelector("video")
+  const deck_doc = document.querySelector(`.deck-${label}`).contentDocument
+  const getPlayer = () => deck_doc.querySelector("video")
+  let player = getPlayer()
 
-  player().addEventListener("loadeddata", () => {
-    state.disp(set_monitor, {
-      [out_name]: document.querySelector(`audio.monitor-${label}`),
-    })
-
-    state.disp(set_master, {
-      [out_name]: document.querySelector(`audio.master-${label}`),
-    })
-
-    state.disp(set_player, { [name]: player() })
-
-    const handle_canplay = () => {
-      const source = get_source(out_name, player().captureStream())
-
-      state.disp(set_player, { [name]: player() })
-
-      state.disp(set_monitor_src, {
-        [src_name]: source,
-      })
-
-      state.disp(set_master_src, {
-        [src_name]: source,
-      })
-    }
-
-    player().volume = 0
-    player().muted = true
-    player().crossOrigin = true
-    player().pause()
-    handle_canplay()
-    player().addEventListener("canplay", handle_canplay)
+  state.disp(set_monitor, {
+    [out_name]: document.querySelector(`audio.monitor-${label}`),
   })
+
+  state.disp(set_master, {
+    [out_name]: document.querySelector(`audio.master-${label}`),
+  })
+
+  state.disp(set_player, { [name]: player })
+
+  const handle_canplay = () => {
+    player = getPlayer()
+    const source = get_source(out_name, player.captureStream())
+
+    state.disp(set_player, { [name]: player })
+
+    state.disp(set_monitor_src, {
+      [src_name]: source,
+    })
+
+    state.disp(set_master_src, {
+      [src_name]: source,
+    })
+
+    player.pause()
+    player.controls = true
+    player.volume = 0.00001
+    player.crossOrigin = true
+  }
+
+  // TODO: Clean up this part
+  const observer = new MutationObserver((changes) => {
+    const playerChange = changes.every(
+      (c) => c.removedNodes[0]?.id !== "player"
+    )
+
+    if (!playerChange) return
+
+    handle_canplay()
+  })
+  observer.observe(deck_doc.body, { childList: true })
+
+  player.addEventListener("canplay", handle_canplay)
 }
 
 const set_devices = ({ monitor_device, master_device } = {}) => {
