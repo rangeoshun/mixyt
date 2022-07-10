@@ -7,23 +7,23 @@ import {
   master,
   set_master_device,
   mixer,
-  set_deck
+  set_deck,
 } from "./state"
 
 const { div, audio, span, iframe } = r.dom
 
-const deck = name => () => [
+const deck = (name) => () => [
   iframe,
   {
     class: `deck ${name}`,
     frameBorder: "none",
-    src: window.location.href.replace(/desktop/, "m") + "&mixyt_role=" + name
-  }
+    src: window.location.href.replace(/desktop/, "m") + "&mixyt_role=" + name,
+  },
 ]
 
-const output = name => () => [audio, { class: name }]
+const output = (name) => () => [audio, { class: name }]
 
-const move_pot = (klass, dest, role) => ev => {
+const move_pot = (klass, dest, role) => (ev) => {
   const knob = document.querySelector("." + klass)
   const frame = knob.parentNode
   const movement = -ev.deltaY || ev.movementY
@@ -50,24 +50,24 @@ const linear_pot = (dest, role) =>
       div,
       {
         class: "pot-frame linear",
-        onwheel: handle_drag
+        onwheel: handle_drag,
       },
       [
         div,
         {
           class: `pot-knob linear ${klass}`,
           style: { top: 10 + (230 - mixer[dest][role] * 230) + "px" },
-          onmousedown: ev => {
+          onmousedown: (ev) => {
             window.addEventListener("mousemove", handle_drag)
             window.addEventListener("mouseup", clear_handle)
-          }
-        }
+          },
+        },
       ],
-      [span, role.toUpperCase()]
+      [span, role.toUpperCase()],
     ]
   }, mixer)
 
-const hor_move_pot = (klass, dest, role) => ev => {
+const hor_move_pot = (klass, dest, role) => (ev) => {
   ev.preventDefault()
 
   const knob = document.querySelector("." + klass)
@@ -96,24 +96,24 @@ const hor_linear_pot = (dest, role) =>
       div,
       {
         class: "pot-frame linear horizontal",
-        onwheel: handle_drag
+        onwheel: handle_drag,
       },
       [
         div,
         {
           class: `pot-knob linear ${klass}`,
           style: { left: 10 + (100 - mixer[dest][role] * 100) + "px" },
-          onmousedown: ev => {
+          onmousedown: (ev) => {
             window.addEventListener("mousemove", handle_drag)
             window.addEventListener("mouseup", clear_handle)
-          }
-        }
+          },
+        },
       ],
-      [span, role.toUpperCase()]
+      [span, role.toUpperCase()],
     ]
   }, mixer)
 
-const rotate_pot = (klass, dest, role) => ev => {
+const rotate_pot = (klass, dest, role) => (ev) => {
   const knob = document.querySelector("." + klass)
   const frame = knob.parentNode
   let ang =
@@ -126,7 +126,7 @@ const rotate_pot = (klass, dest, role) => ev => {
   knob.style.transform = `rotateZ(${ang}deg)`
   state.disp(set_deck, {
     name: dest,
-    [role]: parseInt(((ang + 137) / 270) * 100) / 100
+    [role]: parseInt(((ang + 137) / 270) * 100) / 100,
   })
 }
 
@@ -144,22 +144,22 @@ const radial_pot = (dest, role) =>
       div,
       {
         class: "pot-frame radial",
-        onwheel: handle_drag
+        onwheel: handle_drag,
       },
       [
         div,
         {
           class: `pot-knob radial ${klass}`,
           style: {
-            transform: `rotateZ(${(mixer[dest][role] - 0.5) * 270}deg)`
+            transform: `rotateZ(${(mixer[dest][role] - 0.5) * 270}deg)`,
           },
-          onmousedown: ev => {
+          onmousedown: (ev) => {
             window.addEventListener("mousemove", handle_drag)
             window.addEventListener("mouseup", clear_handle)
-          }
-        }
+          },
+        },
       ],
-      [span, role.toUpperCase()]
+      [span, role.toUpperCase()],
     ]
   }, mixer)
 
@@ -171,7 +171,7 @@ const controls = (name, deck) => [
   [radial_pot(deck, "hi")],
   [radial_pot(deck, "mid")],
   [radial_pot(deck, "bass")],
-  [linear_pot(deck, "master")]
+  [linear_pot(deck, "master")],
 ]
 
 const mixer_cont = () => [
@@ -179,7 +179,7 @@ const mixer_cont = () => [
   { id: "mixer" },
   [controls("controls-a", "deck_a")],
   [div, { class: "controls-spacer" }, [hor_linear_pot("both", "crossfade")]],
-  [controls("controls-b", "deck_b")]
+  [controls("controls-b", "deck_b")],
 ]
 
 export const app = () => [
@@ -191,5 +191,5 @@ export const app = () => [
   [output("master-a")],
   [output("master-b")],
   [output("monitor-a")],
-  [output("monitor-b")]
+  [output("monitor-b")],
 ]

@@ -11,7 +11,7 @@ export const set_tab_active = (tab, is_active) => {
 
   runtime.sendMessage(runtime.id, {
     action: "set_active",
-    active_tab
+    active_tab,
   })
 
   return active_tab
@@ -31,12 +31,12 @@ state.add(is_on, turn_on)
 export const devices = () => ({
   list: [],
   monitor: "default",
-  master: "default"
+  master: "default",
 })
 export const set_devices = (devices, list) => ({ ...devices, list })
-const set_device = role => (devices, device) => ({
+const set_device = (role) => (devices, device) => ({
   ...devices,
-  [role]: devices.list.find(({ id }) => id == device) ? device : "default"
+  [role]: devices.list.find(({ id }) => id == device) ? device : "default",
 })
 export const set_monitor = set_device("monitor")
 export const set_master = set_device("master")

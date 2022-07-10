@@ -6,7 +6,7 @@ import {
   turn_on,
   set_devices,
   set_monitor,
-  set_master
+  set_master,
 } from "./state"
 
 window.s = state
@@ -14,7 +14,7 @@ const runtime = chrome.runtime
 const storage = chrome.storage
 const tabs = chrome.tabs
 
-const store_tab = tab =>
+const store_tab = (tab) =>
   tab && (state.disp(set_tab, tab), state.disp(turn_on, !!tab.is_active))
 
 const handle_devices = (devices = []) => state.disp(set_devices, devices)
@@ -22,11 +22,9 @@ const handle_devices = (devices = []) => state.disp(set_devices, devices)
 const init = () => {
   const app_cont = document.getElementById("app-cont")
   const render_app = r.render(app_cont, [app])
-  // M.FormSelect.init(document.querySelectorAll("select"))
 
   state.on_change(() => {
     render_app()
-    // M.FormSelect.init(document.querySelectorAll("select"))
   })
 
   runtime.onMessage.addListener((message, sender) => {
@@ -51,7 +49,7 @@ const init = () => {
   )
 
   storage.onChanged.addListener(
-    changes =>
+    (changes) =>
       changes && changes.devices && handle_devices(changes.devices.newValue)
   )
 }

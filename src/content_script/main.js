@@ -11,7 +11,7 @@ import {
   set_master_device,
   set_player,
   set_player_prop,
-  set_monitor_device
+  set_monitor_device,
 } from "./state"
 
 import { filter_chains, get_source, cross_gains } from "./audio"
@@ -26,23 +26,24 @@ const clear_frame = () => (
 )
 
 const update_devices = () =>
-  navigator.mediaDevices.enumerateDevices().then(devs =>
+  console.log("updating devices") ||
+  navigator.mediaDevices.enumerateDevices().then((devs) =>
     storage.local.set({
       devices: devs
         .filter(({ kind }) => kind == "audiooutput")
-        .map(({ deviceId, label }) => ({ id: deviceId, label }))
+        .map(({ deviceId, label }) => ({ id: deviceId, label })),
     })
   )
 
-const handle_message = message => {
+const handle_message = (message) => {
   if (message.action == "off") return window.location.reload()
   if (message.action == "update_devices") return update_devices()
 }
 
-const is_src_mutation = mutations =>
-  !!mutations.find(m => m.attributeName == "src")
+const is_src_mutation = (mutations) =>
+  !!mutations.find((m) => m.attributeName == "src")
 
-const init_state = label => {
+const init_state = (label) => {
   const name = `player_${label}`
   const out_name = `out_${label}`
   const src_name = `src_${label}`
@@ -51,11 +52,11 @@ const init_state = label => {
   const player = () => deck_doc().querySelector("video")
 
   state.disp(set_monitor, {
-    [out_name]: document.querySelector(`audio.monitor-${label}`)
+    [out_name]: document.querySelector(`audio.monitor-${label}`),
   })
 
   state.disp(set_master, {
-    [out_name]: document.querySelector(`audio.master-${label}`)
+    [out_name]: document.querySelector(`audio.master-${label}`),
   })
 
   state.disp(set_player, { [name]: player() })
@@ -66,11 +67,11 @@ const init_state = label => {
     state.disp(set_player, { [name]: player() })
 
     state.disp(set_monitor_src, {
-      [src_name]: source
+      [src_name]: source,
     })
 
     state.disp(set_master_src, {
-      [src_name]: source
+      [src_name]: source,
     })
   }
 
@@ -82,7 +83,7 @@ const init_state = label => {
   player().addEventListener("canplay", handle_canplay)
 }
 
-const materialize = cb => {
+const materialize = (cb) => {
   const link = document.createElement("link")
   link.rel = "stylesheet"
   link.href =
@@ -108,7 +109,7 @@ const init = () => {
 
   const update_decks = () => {
     const curr = state.get()
-    ;["deck_a", "deck_b"].forEach(deck_name => {
+    ;["deck_a", "deck_b"].forEach((deck_name) => {
       const deck = curr.mixer[deck_name]
       const { crossfade } = curr.mixer.both
       const label = deck_name.split("_")[1]
@@ -117,14 +118,14 @@ const init = () => {
       if (deck.rate != prev.mixer[deck_name].rate)
         state.disp(set_player_prop, {
           name: "player_" + label,
-          rate: 1 + (0.5 - deck.rate) * 0.08
+          rate: 1 + (0.5 - deck.rate) * 0.08,
         })
-      ;["monitor", "master"].forEach(out_name => {
+      ;["monitor", "master"].forEach((out_name) => {
         if (deck[out_name] == prev.mixer[deck_name][out_name]) return
         document.querySelector(`audio.${out_name}-${label}`).volume =
           deck[out_name]
       })
-      ;["bass", "mid", "hi"].forEach(eq_name => {
+      ;["bass", "mid", "hi"].forEach((eq_name) => {
         if (deck[eq_name] == prev.mixer[deck_name][eq_name]) return
         filter_chains[out_name][eq_name].gain.value =
           (0.5 - deck[eq_name]) * -80
@@ -151,7 +152,7 @@ const init = () => {
   storage.onChanged.addListener(({ monitor_device, master_device }) =>
     set_devices({
       monitor_device: monitor_device && monitor_device.newValue,
-      master_device: master_device && master_device.newValue
+      master_device: master_device && master_device.newValue,
     })
   )
 }

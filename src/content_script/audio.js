@@ -1,8 +1,8 @@
 const contexts = {}
-const create_context = name =>
+const create_context = (name) =>
   (contexts[name] = new AudioContext({
     latencyHint: "playback",
-    sampleRate: 44100
+    sampleRate: 44100,
   }))
 
 const destinations = {}
@@ -12,7 +12,7 @@ const create_destination = (name, role) =>
   ].createMediaStreamDestination())
 
 export const filter_chains = {}
-const create_eq_chain = name => {
+const create_eq_chain = (name) => {
   const ac = contexts[name]
 
   const bass = ac.createBiquadFilter()
@@ -33,7 +33,7 @@ const create_eq_chain = name => {
   const chain = {
     bass,
     mid,
-    hi
+    hi,
   }
 
   filter_chains[name] = chain
@@ -42,7 +42,7 @@ const create_eq_chain = name => {
 }
 
 export const cross_gains = {}
-const create_cross_gain = name =>
+const create_cross_gain = (name) =>
   (cross_gains[name] = contexts[name].createGain())
 
 export const get_source = (name, src_stream) =>

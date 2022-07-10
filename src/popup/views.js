@@ -10,7 +10,7 @@ const switcher = state.conn(
     return [
       div,
       {
-        class: "switch center-align"
+        class: "switch center-align",
       },
       [
         label,
@@ -22,13 +22,13 @@ const switcher = state.conn(
             disabled: !active_tab.is_youtube ? "disabled" : null,
             checked: active_tab.is_active ? "checked" : null,
             onchange: active_tab.is_youtube
-              ? ev => state.disp(turn_on, ev.target.checked)
-              : null
-          }
+              ? (ev) => state.disp(turn_on, ev.target.checked)
+              : null,
+          },
         ],
         [span, { class: "lever" }],
-        "On"
-      ]
+        "On",
+      ],
     ]
   },
   is_on,
@@ -47,10 +47,10 @@ const title_bar = () => [
         a,
         { class: "brand-logo" },
         [img, { src: "images/icon_32.png" }],
-        [span, "MixYT"]
-      ]
-    ]
-  ]
+        [span, "MixYT"],
+      ],
+    ],
+  ],
 ]
 
 const attrs = () => [
@@ -59,14 +59,14 @@ const attrs = () => [
   [
     a,
     { href: "https://www.flaticon.com/authors/freepik", title: "Freepik" },
-    "Freepik "
+    "Freepik ",
   ],
   "from ",
   [
     a,
     { href: "https://www.flaticon.com/", title: "Flaticon" },
-    "www.flaticon.com"
-  ]
+    "www.flaticon.com",
+  ],
 ]
 
 const monitor_select = state.conn(
@@ -78,24 +78,24 @@ const monitor_select = state.conn(
       select,
       {
         disabled: !is_on ? "disabled" : null,
-        onchange: ev =>
-          chrome.storage.local.set({ monitor_device: ev.target.value })
+        onchange: (ev) =>
+          chrome.storage.local.set({ monitor_device: ev.target.value }),
       },
       [
         option,
         {
           value: "",
           disabled: "disabled",
-          selected: !devices.monitor ? "selected" : null
+          selected: !devices.monitor ? "selected" : null,
         },
-        "Select device"
+        "Select device",
       ],
       ...devices.list.map(({ id, label }) => [
         option,
         { value: id, selected: devices.monitor == id ? "selected" : null },
-        label
-      ])
-    ]
+        label,
+      ]),
+    ],
   ],
   is_on,
   devices
@@ -110,24 +110,24 @@ const master_select = state.conn(
       select,
       {
         disabled: !is_on ? "disabled" : null,
-        onchange: ev =>
-          chrome.storage.local.set({ master_device: ev.target.value })
+        onchange: (ev) =>
+          chrome.storage.local.set({ master_device: ev.target.value }),
       },
       [
         option,
         {
           value: "",
           disabled: "disabled",
-          selected: !devices.master ? "selected" : null
+          selected: !devices.master ? "selected" : null,
         },
-        "Select device"
+        "Select device",
       ],
       ...devices.list.map(({ id, label }) => [
         option,
         { value: id, selected: devices.master == id ? "selected" : null },
-        label
-      ])
-    ]
+        label,
+      ]),
+    ],
   ],
   is_on,
   devices
@@ -142,6 +142,6 @@ export const app = () => [
     { class: "container" },
     [div, { class: "section" }, [switcher]],
     [div, { class: "section" }, [monitor_select], [master_select]],
-    [div, { class: "section" }, [attrs]]
-  ]
+    [div, { class: "section" }, [attrs]],
+  ],
 ]

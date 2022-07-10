@@ -15,8 +15,8 @@
     "contentSettings",
     "tabs",
     "storage",
-    "webRequest",
-    "webRequestBlocking"
+    "scripting",
+    "webRequest"
   ],
   "content_scripts": [
     {
