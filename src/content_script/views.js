@@ -124,9 +124,14 @@ const rotate_pot = (klass, dest, role) => (ev) => {
   else if (ang > 135) ang = 135
 
   knob.style.transform = `rotateZ(${ang}deg)`
+
+  const value = parseInt(((ang + 137) / 270) * 100) / 100
+
+  if (!isFinite(value)) return
+
   state.disp(set_deck, {
     name: dest,
-    [role]: parseInt(((ang + 137) / 270) * 100) / 100,
+    [role]: value,
   })
 }
 
