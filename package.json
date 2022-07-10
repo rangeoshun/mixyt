@@ -10,7 +10,7 @@
     "watch": "node scripts/watch.js"
   },
   "dependencies": {
-    "redda": "^1.4.3"
+    "redda": "^1.5.3"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.89",

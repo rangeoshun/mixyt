@@ -572,9 +572,9 @@ readdirp@^3.1.1:
   dependencies:
     picomatch "^2.0.4"
 
-redda@^1.4.3:
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/redda/-/redda-1.4.3.tgz#073553cee342855c1f8edf635a9e8c58ff4acaea"
+redda@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/redda/-/redda-1.5.3.tgz#7dd18b13b5e81d533d0dbaf58e12d674074105be"
 
 resolve-path@^1.4.0:
   version "1.4.0"
