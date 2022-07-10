@@ -4,10 +4,10 @@ const resolve = require("rollup-plugin-node-resolve")
 const chalk = require("chalk")
 
 const backgroundWatcher = rollup.watch({
-  input: "src/background/main.js",
+  input: "src/service_worker/main.js",
   output: {
-    file: "build/background.js",
-    format: "umd"
+    file: "build/service_worker.js",
+    format: "umd",
   },
   plugins: [
     resolve(),
@@ -15,33 +15,33 @@ const backgroundWatcher = rollup.watch({
       [
         {
           files: "public/**/*.*",
-          dest: "build"
-        }
+          dest: "build",
+        },
       ],
       { watch: true, verbose: true }
-    )
-  ]
+    ),
+  ],
 })
 
 const contentWatcher = rollup.watch({
   input: "src/content_script/main.js",
   output: {
     file: "build/content_script.js",
-    format: "umd"
+    format: "umd",
   },
-  plugins: [resolve()]
+  plugins: [resolve()],
 })
 
 const popupWatcher = rollup.watch({
   input: "src/popup/main.js",
   output: {
     file: "build/popup.js",
-    format: "umd"
+    format: "umd",
   },
-  plugins: [resolve()]
+  plugins: [resolve()],
 })
 
-const buildLogger = event => {
+const buildLogger = (event) => {
   switch (event.code) {
     case "START":
       break
