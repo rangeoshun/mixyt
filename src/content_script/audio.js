@@ -55,11 +55,14 @@ export const connect_node = (name, src, dest_elem, role) => {
   const gain = cross_gains[name] || create_cross_gain(name)
 
   src.connect(eq.bass)
-  if (role == "master") {
-    eq.hi.connect(gain)
-    gain.connect(dest)
-  } else if (role == "monitor") {
-    eq.hi.connect(dest)
+
+  switch (role) {
+    case "master":
+      eq.hi.connect(gain)
+      gain.connect(dest)
+
+    case "monitor":
+      eq.hi.connect(dest)
   }
 
   dest_elem.srcObject = dest.stream

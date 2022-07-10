@@ -50,44 +50,39 @@ const init_state = (label) => {
     document.querySelector(`.deck-${label}`).contentDocument
   const player = () => deck_doc().querySelector("video")
 
-  state.disp(set_monitor, {
-    [out_name]: document.querySelector(`audio.monitor-${label}`),
-  })
+  player().addEventListener("loadeddata", () => {
+    console.log("loadeddata")
+    state.disp(set_monitor, {
+      [out_name]: document.querySelector(`audio.monitor-${label}`),
+    })
 
-  state.disp(set_master, {
-    [out_name]: document.querySelector(`audio.master-${label}`),
-  })
-
-  state.disp(set_player, { [name]: player() })
-
-  const handle_canplay = () => {
-    const source = get_source(out_name, player().captureStream())
+    state.disp(set_master, {
+      [out_name]: document.querySelector(`audio.master-${label}`),
+    })
 
     state.disp(set_player, { [name]: player() })
 
-    state.disp(set_monitor_src, {
-      [src_name]: source,
-    })
+    const handle_canplay = () => {
+      const source = get_source(out_name, player().captureStream())
 
-    state.disp(set_master_src, {
-      [src_name]: source,
-    })
-  }
+      state.disp(set_player, { [name]: player() })
 
-  player().volume = 0
-  player().muted = true
-  player().crossOrigin = true
-  player().pause()
-  handle_canplay()
-  player().addEventListener("canplay", handle_canplay)
-}
+      state.disp(set_monitor_src, {
+        [src_name]: source,
+      })
 
-const materialize = (cb) => {
-  const link = document.createElement("link")
-  link.rel = "stylesheet"
-  link.href =
-    "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
-  body.appendChild(link)
+      state.disp(set_master_src, {
+        [src_name]: source,
+      })
+    }
+
+    player().volume = 0
+    player().muted = true
+    player().crossOrigin = true
+    player().pause()
+    handle_canplay()
+    player().addEventListener("canplay", handle_canplay)
+  })
 }
 
 const set_devices = ({ monitor_device, master_device } = {}) => {
@@ -95,20 +90,24 @@ const set_devices = ({ monitor_device, master_device } = {}) => {
   if (master_device) state.disp(set_master_device, master_device)
 }
 
+const DECKS = ["deck_a", "deck_b"]
+const OUTPUTS = ["monitor", "master"]
+const CHANNELS = ["bass", "mid", "hi"]
+
 const init = () => {
   if (location.href.match("mixyt_role")) return
 
   clear_frame()
-  materialize()
 
   const app_cont = document.getElementById("app-cont")
-  const render_app = r.render(app_cont, [app])
+  r.render(app_cont, [app])
 
   let prev = state.get()
 
   const update_decks = () => {
     const curr = state.get()
-    ;["deck_a", "deck_b"].forEach((deck_name) => {
+
+    DECKS.forEach((deck_name) => {
       const deck = curr.mixer[deck_name]
       const { crossfade } = curr.mixer.both
       const label = deck_name.split("_")[1]
@@ -119,16 +118,21 @@ const init = () => {
           name: "player_" + label,
           rate: 1 + (0.5 - deck.rate) * 0.08,
         })
-      ;["monitor", "master"].forEach((out_name) => {
+
+      OUTPUTS.forEach((out_name) => {
         if (deck[out_name] == prev.mixer[deck_name][out_name]) return
+
         document.querySelector(`audio.${out_name}-${label}`).volume =
           deck[out_name]
       })
-      ;["bass", "mid", "hi"].forEach((eq_name) => {
+
+      CHANNELS.forEach((eq_name) => {
         if (deck[eq_name] == prev.mixer[deck_name][eq_name]) return
+
         filter_chains[out_name][eq_name].gain.value =
           (0.5 - deck[eq_name]) * -80
       })
+
       if (crossfade != prev.mixer.both.crossfade) {
         const fader = deck_name == "deck_a" ? crossfade : 1 - crossfade
 
