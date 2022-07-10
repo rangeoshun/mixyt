@@ -26,7 +26,6 @@ const clear_frame = () => (
 )
 
 const update_devices = () =>
-  console.log("updating devices") ||
   navigator.mediaDevices.enumerateDevices().then((devs) =>
     storage.local.set({
       devices: devs
