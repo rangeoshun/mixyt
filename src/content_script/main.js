@@ -51,7 +51,6 @@ const init_state = (label) => {
   const player = () => deck_doc().querySelector("video")
 
   player().addEventListener("loadeddata", () => {
-    console.log("loadeddata")
     state.disp(set_monitor, {
       [out_name]: document.querySelector(`audio.monitor-${label}`),
     })
