@@ -8,8 +8,7 @@
     "128": "images/icon_128.png"
   },
   "background": {
-    "scripts": ["background.js"],
-    "persistent": true
+    "service_worker": "service_worker.js"
   },
   "permissions": [
     "activeTab",
@@ -17,17 +16,8 @@
     "tabs",
     "storage",
     "webRequest",
-    "webRequestBlocking",
-    "https://*.youtube.com/",
-    "https://*.googlevideo.com/"
+    "webRequestBlocking"
   ],
-  "browser_action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "images/icon_16.png",
-      "32": "images/icon_32.png"
-    }
-  },
   "content_scripts": [
     {
       "matches": ["http://*.youtube.com/watch*"],
@@ -35,6 +25,16 @@
       "js": ["content_script.js"]
     }
   ],
-  "content_security_policy": "default-src 'self'; style-src https://cdnjs.cloudflare.com https://fonts.googleapis.com 'self'; font-src https://fonts.gstatic.com; object-src 'self'; script-src https://cdnjs.cloudflare.com 'unsafe-eval' 'self' blob: filesystem:;",
-  "manifest_version": 2
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; style-src https://cdnjs.cloudflare.com https://fonts.googleapis.com 'self'; font-src https://fonts.gstatic.com; object-src 'self'; script-src https://cdnjs.cloudflare.com 'unsafe-eval' 'self' blob: filesystem:;"
+  },
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon_16.png",
+      "32": "images/icon_32.png"
+    }
+  },
+  "host_permissions": ["https://*.youtube.com/", "https://*.googlevideo.com/"]
 }
