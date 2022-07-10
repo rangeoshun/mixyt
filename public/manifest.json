@@ -26,7 +26,7 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; style-src https://cdnjs.cloudflare.com https://fonts.googleapis.com 'self'; font-src https://fonts.gstatic.com; object-src 'self'; script-src https://cdnjs.cloudflare.com 'unsafe-eval' 'self' blob: filesystem:;"
+    "extension_pages": "default-src 'self'; style-src https://cdnjs.cloudflare.com https://fonts.googleapis.com 'self'; font-src https://fonts.gstatic.com; object-src 'self'; script-src 'self';"
   },
   "manifest_version": 3,
   "action": {
